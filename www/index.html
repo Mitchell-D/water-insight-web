@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="style/main.css">
+</head>
+<body>
+    <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
+        <a class="navbar-brand col-md-4 col-lg-2 me-0 px-3" href="#">NASA WaterView</a>
+        <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebar_menu" aria-controls="sidebar_menu" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+        </button>
+        <!--
+        <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
+        <div class="navbar-nav">
+        <div class="nav-item text-nowrap">
+            <a class="nav-link px-3" href="#">Sign out</a>
+        </div>
+        </div>
+        -->
+    </header>
+    
+    <div class="container-fluid">
+        <div class="row">
+        <nav id="sidebar_menu" class="col-md-4 col-lg-3 d-md-block bg-light sidebar collapse">
+            <div class="position-sticky pt-3">
+                <div class="row" id="menu_time_resolution_row">
+                    <p class="text-center menu-section-title">Time Resolution</p>
+                    <div id="menu_container_timeres"></div>
+                </div>
+                <hr/>
+                <div class="row" id="menu_data_selection_row">
+                    <p class="text-center menu-section-title">Data Selection</p>
+                    <p class="menu-dropdown-label">Choose Data Feature</p>
+                    <div class="dropdown" id="menu_container_feat">
+                        <button class="btn btn-secondary dropdown-toggle menu-dropdown-button" type="button" id="menu_dropdown_feat" data-bs-toggle="dropdown" aria-expanded="false">
+                            Data Feature
+                        </button>
+                        <ul class="dropdown-menu menu-dropdown-items" aria-labelledby="menu_dropdown_feat"> </ul>
+                    </div>
+                    <p class="menu-dropdown-label">Choose Data Metric</p>
+                    <div class="dropdown" id="menu_container_metric">
+                        <button class="btn btn-secondary dropdown-toggle menu-dropdown-button" type="button" id="menu_dropdown_metric" data-bs-toggle="dropdown" aria-expanded="false">
+                            Data Metric
+                        </button>
+                        <ul class="dropdown-menu menu-dropdown-items" aria-labelledby="menu_dropdown_metric"> </ul>
+                    </div>
+                </div>
+                <hr/>
+                <div class="row" id="menu_display_settings_row">
+                    <p class="text-center menu-section-title">Display Settings</p>
+                    <div class="input-group" id="menu_container_vmin">
+                        <!--<label for="menu_input_vmin" class="menu-dropdown-label">Value Min</label>-->
+                        <span class="input-group-text" id="menu_input_vmin">Value Min</span>
+                        <input class="text-center form-control" type="number" aria-describeddby="menu_input_vmin" disabled></input>
+                    </div>
+                    <div class="input-group" id="menu_container_vmax">
+                        <!--<label for="menu_input_vmax" class="menu-dropdown-label">Value Max</label>-->
+                        <span class="input-group-text" id="menu_input_vmax">Value Max</span>
+                        <input class="text-center form-control" type="number" aria-describeddby="menu_input_vmax" disabled></input>
+                    </div>
+                    <p class="menu-dropdown-label">Color Maps</p>
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle menu-dropdown-button" type="button" id="menu_dropdown_colormap" data-bs-toggle="dropdown" aria-expanded="false">
+                            Color Maps
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="menu_dropdown_colormap"> </ul>
+                    </div>
+                </div>
+                <hr/>
+                <div class="row" id="menu_update_row">
+                </div>
+            </div>
+        </nav>
+    
+        <main class="col-md-8 ms-sm-auto col-lg-9 px-md-4">
+            <!-- Dashboard header with buttons and dropdown
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">Dashboard</h1>
+            <div class="btn-toolbar mb-2 mb-md-0">
+                <div class="btn-group me-2">
+                <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                This week
+                </button>
+            </div>
+            </div>
+            -->
+    
+            <canvas class="my-4 w-100" id="main_data_render" style="display: block;"></canvas>
+    
+            <h2>Section title</h2>
+            <div class="table-responsive">
+            </div>
+        </main>
+    </div>
+    <template id="radio_time_res_temp">
+        <div class="form-check">
+            <input class="form-check-input menu-radio-checkbox" type="radio" name="resMenuRadio">
+            <label class="form-check-label" for="resMenuRadio">
+                <p class="menu-radio-label-name"></p>
+                <p class="menu-radio-date-range"></p>
+            </label>
+        </div>
+    </template>
+    <template id="menu_dropdown"><li><a class="dropdown-item" href="#"></a></li></template>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="scripts/pagefuncs.js"></script>
+</body>
+</html>

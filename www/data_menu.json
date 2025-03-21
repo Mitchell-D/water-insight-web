@@ -1,0 +1,229 @@
+{
+    "time_resolutions":{
+        "Hourly":{
+            "nhours":1,
+            "init_time":1741018671000,
+            "final_time":1743610671000,
+            "default_feat":"soilm-10",
+            "data_features":[
+                "weasd", "soilm-10", "soilm-40", "soilm-100", "soilm-200",
+                "rsm-10", "rsm-40", "rsm-100", "rsm-200", "apcp", "evbs", "trans",
+                "ssrun", "bgrun"
+            ]
+        },
+        "Daily":{
+            "nhours":24,
+            "init_time":1734480000000,
+            "final_time":1742256000000,
+            "default_feat":"soilm-10",
+            "data_features":[
+                "weasd", "soilm-10", "soilm-40", "soilm-100", "soilm-200",
+                "rsm-10", "rsm-40", "rsm-100", "rsm-200", "apcp", "evbs", "trans",
+                "ssrun", "bgrun"
+            ]
+        },
+        "Monthly":{
+            "nhours":672,
+            "init_time":1426636800000,
+            "final_time":1742256000000,
+            "default_feat":"soilm-10",
+            "data_features":[
+                "weasd", "soilm-10", "soilm-40", "soilm-100", "soilm-200",
+                "rsm-10", "rsm-40", "rsm-100", "rsm-200", "apcp", "evbs", "trans",
+                "ssrun", "bgrun"
+            ]
+        },
+        "Annual":{
+            "nhours":8736,
+            "init_time":953337600000,
+            "final_time":1742256000000,
+            "default_feat":"soilm-10",
+            "data_features":[
+                "weasd", "soilm-10", "soilm-40", "soilm-100", "soilm-200",
+                "rsm-10", "rsm-40", "rsm-100", "rsm-200", "apcp", "evbs", "trans",
+                "ssrun", "bgrun"
+            ]
+        },
+        "Climotological":{
+            "nhours":null,
+            "init_time":757382400000,
+            "final_time":1742256000000,
+            "default_feat":"apcp",
+            "data_features":[
+                "weasd", "soilm-10", "soilm-40", "soilm-100", "soilm-200",
+                "rsm-10", "rsm-40", "rsm-100", "rsm-200", "apcp", "evbs", "trans",
+                "ssrun", "bgrun"
+            ]
+        }
+    },
+    "data_features":{
+        "weasd":{
+            "long_title":"Snow Water Equivalent",
+            "short_title":"SWE",
+            "unit":"kg / m^2",
+            "default_metric":"mean",
+            "metrics":[
+                {"name":"mean", "vrange":[0,100]},
+                {"name":"stdev", "vrange":[0,20]},
+                {"name":"min", "vrange":[0,20]},
+                {"name":"max", "vrange":[0,200]},
+                {"name":"change", "vrange":[-5,5]}
+            ]
+        },
+        "soilm-10":{
+            "long_title":"0-10cm Volumetric Soil Moisture",
+            "short_title":"0-10cm VSM",
+            "unit":"kg / m^2",
+            "default_metric":"mean",
+            "metrics":[
+                {"name":"mean", "vrange":[2,50]},
+                {"name":"stdev", "vrange":[0,20]},
+                {"name":"min", "vrange":[2,50]},
+                {"name":"max", "vrange":[2,50]},
+                {"name":"change", "vrange":[-5,5]}
+            ]
+        },
+        "soilm-40":{
+            "long_title":"10-40cm Volumetric Soil Moisture",
+            "short_title":"10-40cm VSM",
+            "unit":"%",
+            "default_metric":"mean",
+            "metrics":[
+                {"name":"mean", "vrange":[5,150]},
+                {"name":"stdev", "vrange":[0,20]},
+                {"name":"min", "vrange":[5,150]},
+                {"name":"max", "vrange":[5,150]},
+                {"name":"change", "vrange":[-10,10]}
+            ]
+        },
+        "soilm-100":{
+            "long_title":"40-100cm Volumetric Soil Moisture",
+            "short_title":"40-100cm VSM",
+            "unit":"%",
+            "default_metric":"mean",
+            "metrics":[
+                {"name":"mean", "vrange":[10,300]},
+                {"name":"stdev", "vrange":[0,20]},
+                {"name":"min", "vrange":[10,300]},
+                {"name":"max", "vrange":[10,300]},
+                {"name":"change", "vrange":[-20,20]}
+            ]
+        },
+        "soilm-200":{
+            "long_title":"100-200cm Volumetric Soil Moisture",
+            "short_title":"100-200cm VSM",
+            "unit":"%",
+            "default_metric":"mean",
+            "metrics":[
+                {"name":"mean", "vrange":[20,500]},
+                {"name":"stdev", "vrange":[0,20]},
+                {"name":"min", "vrange":[20,500]},
+                {"name":"max", "vrange":[20,500]},
+                {"name":"change", "vrange":[-30,30]}
+            ]
+        },
+        "rsm-10":{
+            "long_title":"0-10cm Relative Soil Moisture",
+            "short_title":"0-10cm RSM",
+            "unit":"%",
+            "default_metric":"mean",
+            "metrics":[
+                {"name":"mean", "vrange":[-0.2,1]},
+                {"name":"stdev", "vrange":[0,1]},
+                {"name":"min", "vrange":[-0.2,1]},
+                {"name":"max", "vrange":[-0.2,1]},
+                {"name":"change", "vrange":[-0.1,0.1]}
+            ]
+        },
+        "rsm-40":{
+            "long_title":"10-40cm Relative Soil Moisture",
+            "short_title":"10-40cm RSM",
+            "unit":"%",
+            "default_metric":"mean",
+            "metrics":[
+                {"name":"mean", "vrange":[-0.2,1]},
+                {"name":"stdev", "vrange":[0,1]},
+                {"name":"min", "vrange":[-0.2,1]},
+                {"name":"max", "vrange":[-0.2,1]},
+                {"name":"change", "vrange":[-0.1,0.1]}
+            ]
+        },
+        "rsm-100":{
+            "long_title":"40-100cm Relative Soil Moisture",
+            "short_title":"40-100cm RSM",
+            "unit":"%",
+            "default_metric":"mean",
+            "metrics":[
+                {"name":"mean", "vrange":[-0.2,1]},
+                {"name":"stdev", "vrange":[0,1]},
+                {"name":"min", "vrange":[-0.2,1]},
+                {"name":"max", "vrange":[-0.2,1]},
+                {"name":"change", "vrange":[-0.1,0.1]}
+            ]
+        },
+        "rsm-200":{
+            "long_title":"100-200cm Relative Soil Moisture",
+            "short_title":"100-200cm RSM",
+            "unit":"%",
+            "default_metric":"mean",
+            "metrics":[
+                {"name":"mean", "vrange":[-0.2,1]},
+                {"name":"stdev", "vrange":[0,1]},
+                {"name":"min", "vrange":[-0.2,1]},
+                {"name":"max", "vrange":[-0.2,1]},
+                {"name":"change", "vrange":[ -0.1,0.1]}
+            ]
+        },
+        "apcp":{
+            "long_title":"Precipitation Area Density",
+            "short_title":"Precip",
+            "unit":"kg / m^2",
+            "default_metric":"total",
+            "metrics":[
+                {"name":"mean", "vrange":[0,0.5]},
+                {"name":"max", "vrange":[0,50]},
+                {"name":"total", "vrange":[0, 0.5]}
+            ]
+        },
+        "evbs":{
+            "long_title":"Bare Surface Evaporation",
+            "short_title":"Evaporation",
+            "unit":"W / m^2",
+            "default_metric":"mean",
+            "metrics":[
+                {"name":"mean", "vrange":[0,10]},
+                {"name":"stdev", "vrange":[0,10]},
+                {"name":"total", "vrange":[0,50]}
+            ]
+        },
+        "trans":{
+            "long_title":"Plant Transpiration",
+            "short_title":"Transpiration",
+            "Unit":"W / m^2",
+            "default_metric":"mean",
+            "metrics":[
+                {"name":"mean", "vrange":[0,50]},
+                {"name":"stdev", "vrange":[0,50]},
+                {"name":"total", "vrange":[0,200]}
+            ]
+        },
+        "ssrun":{
+            "long_title":"Surface Runoff",
+            "short_title":"Surface Runoff",
+            "Unit":"kg / m^2",
+            "default_metric":"total",
+            "metrics":[
+                {"name":"total", "vrange":[0,20]}
+            ]
+        },
+        "bgrun":{
+            "long_title":"Subsurface Runoff",
+            "short_title":"Subsurface Runoff",
+            "Unit":"kg / m^2",
+            "default_metric":"total",
+            "metrics":[
+                {"name":"total", "vrange":[0,100]}
+            ]
+        }
+    }
+}

@@ -1,0 +1,41 @@
+/*
+display prop types: https://www.w3schools.com/cssref/pr_class_display.php
+*/
+.wv-button {
+    background-color:#f6b26b;
+    color:#000000;  /* text color */
+    border: .2rem solid #e69138; /* size type color */
+    padding: 10px 20px; /* top/bottom interior pad (adaptive args) */
+    text-align:center; /* horizontal alignment in a div */
+    display:inline-block; /* element rendering box behavior */
+    font-size:14px; 
+}
+
+.menu-radio-label-name {
+    margin-bottom: 0px;
+}
+.menu-radio-date-range {
+    margin-bottom: 16px;
+    font-size:75%;
+}
+.menu-section-title {
+    font-weight:500;
+    font-size:150%;
+    line-height:100%;
+}
+.menu-dropdown-button {
+    width:85%;
+    padding:10px 20px;
+    margin:0px 20px;
+}
+#menu_radio_container {
+    padding:0px 20px;
+}
+.menu-dropdown-label {
+    margin-bottom:0px;
+    margin:0px 20px;
+}
+.menu-dropdown-items {
+    max-height:200px;
+    overflow-y:scroll;
+}
