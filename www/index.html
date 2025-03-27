@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <title>Water Insight Webviewer</title>
+    <link rel="icon" href="images/favicon.ico">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
@@ -10,9 +12,9 @@
 </head>
 <body>
     <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
-        <a class="navbar-brand col-md-4 col-lg-2 me-0 px-3" href="#">NASA WaterView</a>
-        <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebar_menu" aria-controls="sidebar_menu" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
+        <a class="navbar-brand text-center col-md-4 col-lg-2 me-0 px-3" href="#">NASA WaterView</a>
+        <button class="navbar-toggler d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebar_menu" aria-controls="sidebar_menu" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
         </button>
         <!--
         <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
@@ -63,6 +65,7 @@
                         <span class="input-group-text" id="menu_input_vmax">Value Max</span>
                         <input class="text-center form-control" type="number" aria-describeddby="menu_input_vmax" disabled></input>
                     </div>
+                    <!--
                     <p class="menu-dropdown-label">Color Maps</p>
                     <div class="dropdown">
                         <button class="btn btn-secondary dropdown-toggle menu-dropdown-button" type="button" id="menu_dropdown_colormap" data-bs-toggle="dropdown" aria-expanded="false">
@@ -70,9 +73,15 @@
                         </button>
                         <ul class="dropdown-menu" aria-labelledby="menu_dropdown_colormap"> </ul>
                     </div>
+                    -->
                 </div>
                 <hr/>
-                <div class="row" id="menu_update_row">
+                <div class="row" id="menu_date_range_row">
+                    <input id="menu_date_range" name="daterange" class="form-control" type="text"/>
+                </div>
+                <hr/>
+                <div class="row" id="menu_submit_row">
+                    <button type="button" id="menu_submit_button" class="btn btn-primary btn-lg">Load Data</button>
                 </div>
             </div>
         </nav>
@@ -94,9 +103,14 @@
             </div>
             -->
     
-            <canvas class="my-4 w-100" id="main_data_render" style="display: block;"></canvas>
+            <div class="row" id="main_canvas_row">
+                <canvas class="my-4 w-100" id="main_canvas" style="display: block;"></canvas>
+            </div>
+            <div class="row">
+                <h6 id="main_label_active" class="text-center"></h6>
+                <div id="main_container_ticker" class="d-flex flex-wrap p-2 justify-content-center align-items-center"></div>
+            </div>
     
-            <h2>Section title</h2>
             <div class="table-responsive">
             </div>
         </main>
@@ -111,7 +125,12 @@
         </div>
     </template>
     <template id="menu_dropdown"><li><a class="dropdown-item" href="#"></a></li></template>
+    <template id="ticker_template"> <div id="" class="mr-1 border border-dark buffer-ticker-inactive"></div> </template>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
     <script src="scripts/pagefuncs.js"></script>
 </body>
 </html>
