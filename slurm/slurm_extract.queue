@@ -1,0 +1,35 @@
+#!/bin/csh
+### SLURM batch script
+
+### Email address
+#SBATCH --mail-user=mtd0012@uah.edu
+
+### queue type
+#SBATCH -p standard
+
+### TOTAL processors (number of tasks)
+###SBATCH --ntasks 14
+#SBATCH --ntasks 1
+
+### total run time estimate (D-HH:MM)
+#SBATCH -t 2-00:00
+
+### memory (MB per CPU)
+#SBATCH --mem-per-cpu=32G
+
+### Mail to user on job done and fail
+#SBATCH --mail-type=END,FAIL
+
+### Job name
+#SBATCH -J datafeed
+
+### Ouput files
+###SBATCH --open-mode=append ### Don't overwrite existing files
+#SBATCH -o /rhome/mdodson/water-insight-web/slurm/out/slurm_update_datafeed.out # STDOUT
+#SBATCH -o /rhome/mdodson/water-insight-web/slurm/out/slurm_update_datafeed.err # STDOUT
+
+cd /rhome/mdodson/water-insight-web
+
+#Run code
+set runcmd = /nas/rhome/mdodson/.micromamba/envs/learn3/bin/python
+${runcmd} -u update_datafeed.py
