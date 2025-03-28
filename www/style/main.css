@@ -39,9 +39,12 @@ display prop types: https://www.w3schools.com/cssref/pr_class_display.php
     max-height:200px;
     overflow-y:scroll;
 }
+.menu-numform-label {
+    width:100px;
+}
 
 body {
-    background-image:url("../images/background-reduced.png");
+    /*background-image:url("../images/background-reduced.png");*/
     background-position: top;
     background-repeat: repeat;
     background-size: cover;
@@ -53,5 +56,15 @@ body {
 .buffer-ticker-inactive {
     width:15px;
     height:15px;
-    background:white;
+    background:rgb(255, 255, 255);
+}
+.buffer-ticker-disabled {
+    width:15px;
+    height:15px;
+    background:rgb(52, 51, 51);
+}
+.buffer-ticker-active {
+    width:15px;
+    height:15px;
+    background:#0d6efd;
 }
