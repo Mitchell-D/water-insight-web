@@ -17,7 +17,7 @@ let state = {
     // provides available files given menu selection
     "datafeed":null,
     // initial and final buffer indeces
-    "buf_ix0":null,
+    "buf_ixs":null,
     "buf_ixf":null,
 
     // image buffer state
@@ -27,10 +27,12 @@ let state = {
 
     // image iteration
     "tick_active":null,
+    "looping":false,
 }
 
 //const parser = new DOMParser();
 const img_dir_url = "https://www.nsstc.uah.edu/data/mitchell.dodson/nldas2/rgbs/";
+var cycle_handle = null;
 
 let D = document;
 let $t_time_res_radio = D.getElementById("radio_time_res_temp");
@@ -39,6 +41,11 @@ let $t_ticker = D.getElementById("ticker_template");
 //let $main_canvas = D.getElementById("main_canvas");
 let $main_container_ticker = D.getElementById("main_container_ticker");
 let $main_label_active = D.getElementById("main_label_active");
+let $main_header_text = D.getElementById("main_header_text");
+let $buffer_button_prev = D.getElementById("buffer_button_prev");
+let $buffer_button_toggle = D.getElementById("buffer_button_toggle");
+let $buffer_button_next = D.getElementById("buffer_button_next");
+let $buffer_input_framedelay = D.getElementById("buffer_input_framedelay");
 let $menu_container_timeres = D.getElementById("menu_container_timeres");
 let $menu_container_feat = D.getElementById("menu_container_feat");
 let $menu_container_metric = D.getElementById("menu_container_metric");
@@ -51,6 +58,7 @@ let $menu_submit_button = D.getElementById("menu_submit_button");
 
 //const main_ctx = $main_canvas.getContext("2d");
 //main_ctx.imageSmoothingEnabled = false;
+
 /* ---------------( Menu Update Functions )--------------- */
 
 /*
@@ -73,7 +81,7 @@ function loadMenuTimeRes(initial_load=false){
         let drange = `(${tmp_t0} - ${tmp_tf})`;
         tmp_radio.querySelector(".menu-radio-date-range").textContent = drange;
         */
-        tmp_radio.querySelector(".menu-radio-label-name").textContent = k
+        tmp_radio.querySelector(".menu-radio-label-name").textContent = cap(k);
         // set default value to checked per the menu state
         if (initial_load && (k==state["menu_defaults"]["res"])) {
             tmp_radio.querySelector(".menu-radio-checkbox").checked = true;
@@ -195,25 +203,38 @@ function loadDataFeed(){
 }
 
 function setFeedDateRange(etime_init, etime_final, init_dt){
+    // initial and final available times
     let t0 = new Date(0);
     let tf = new Date(0);
-    let ts = new Date(0);
+    // initial and final buffered times
+    let bs = new Date(0);
+    let bf = new Date(0);
+    // set the time bounds of the full array
     t0.setUTCSeconds(etime_init);
     tf.setUTCSeconds(etime_final);
-    ts.setUTCSeconds((etime_final-init_dt)); // initial start time
-    state["buf_ix0"] = getFirstFeedIndexAfter(etime_final-init_dt);
-    state["buf_ixf"] = getLastFeedIndexBefore(etime_final);
+    // start with the default time bounds if no previous date range selected
+    if ((state["buf_ts"] == null) || (state["buf_tf"] == null)){
+        state["buf_ts"] = etime_final-init_dt;
+        state["buf_tf"] = etime_final;
+    }
+    bs.setUTCSeconds(state["buf_ts"]);
+    bf.setUTCSeconds(state["buf_tf"]);
+
+    state["buf_ixs"] = getFirstFeedIndexAfter(state["buf_ts"]);
+    state["buf_ixf"] = getLastFeedIndexBefore(state["buf_tf"]);
     $("#menu_date_range").daterangepicker({
         "showDropdowns": true,
         "minYear": t0.getFullYear(),
         "maxYear": tf.getFullYear(),
-        "startDate": `${ts.getMonth()+1}/${ts.getDate()}/${ts.getFullYear()}`,
-        "endDate": `${tf.getMonth()+1}/${tf.getDate()}/${tf.getFullYear()}`,
+        "startDate": `${bs.getMonth()+1}/${bs.getDate()}/${bs.getFullYear()}`,
+        "endDate": `${bf.getMonth()+1}/${bf.getDate()}/${bf.getFullYear()}`,
         "minDate": `${t0.getMonth()+1}/${t0.getDate()}/${t0.getFullYear()}`,
         "maxDate": `${tf.getMonth()+1}/${tf.getDate()}/${tf.getFullYear()}`,
     }, function(start, end, label){
-        state["buf_ix0"] = getFirstFeedIndexAfter(start.unix(), true);
-        state["buf_ixf"] = getLastFeedIndexBefore(end.unix(), true);
+        state["buf_ts"] = start.unix();
+        state["buf_tf"] = end.unix();
+        state["buf_ixs"] = getFirstFeedIndexAfter(state["buf_ts"], true);
+        state["buf_ixf"] = getLastFeedIndexBefore(state["buf_tf"], true);
     });
 }
 
@@ -278,6 +299,10 @@ function fmtDate(d, include_hours=true) {
     return s
 }
 
+function cap(val) {
+    return String(val).charAt(0).toUpperCase() + String(val).slice(1);
+}
+
 /* ---------------( Event Listeners )--------------- */
 
 D.addEventListener("DOMContentLoaded", async function(){
@@ -292,21 +317,34 @@ D.addEventListener("DOMContentLoaded", async function(){
     loadMenuTimeRes(true);
 })
 
+$buffer_button_next.addEventListener("click", () => { bufferStep(1); })
+$buffer_button_prev.addEventListener("click", () => { bufferStep(-1); })
+$buffer_button_toggle.addEventListener("click", () => { toggleBufferLoop(); })
+
 $menu_submit_button.addEventListener("click", async ()=>{
+    // Stop looping in order to load new data 
+    let was_looping = state["looping"];
+    if (was_looping) { toggleBufferLoop(); }
     state["frozen"] += 1;
     $main_container_ticker.replaceChildren();
+    state["image_buffer"] = {};
     let buf_urls = [];
-    for (let i=state["buf_ix0"] ; i<=state["buf_ixf"] ; i++) {
+    $main_header_text.innerText = [
+        cap(state["sel_res"]),
+        cap(state["sel_metric"]["name"]),
+        state["aux_feats"][state["sel_feat"]]["long_title"],
+        `(${state["aux_feats"][state["sel_feat"]]["unit"]})`,
+    ].join(" ");
+    for (let i=state["buf_ixs"] ; i<=state["buf_ixf"] ; i++) {
         let ticker = $t_ticker.content.querySelector("div").cloneNode(true);
         //let ticker = D.importNode($t_ticker.content.querySelector("div"));
         ticker.setAttribute("title", state["datafeed"][i]["stime"]);
         ticker.id = "ticker_" + state["datafeed"][i]["stime"];
         ticker.path = state["datafeed"][i]["fname"];
         ticker.addEventListener("click", (e) => {
-            console.log(e.detail);
             if (e.detail == 2) {
                 console.log("activated");
-                setActiveTicker(e.target.path);
+                setActiveTicker(e.target.title);
             }
             else {
                 console.log("toggled");
@@ -314,44 +352,37 @@ $menu_submit_button.addEventListener("click", async ()=>{
         })
         $main_container_ticker.append(ticker);
         buf_urls.push({
-            "key":ticker.path,
+            //"key":ticker.path,
+            "key":ticker.title, // use title so shared between datasets
             "url":img_dir_url+state["datafeed"][i]["fname"],
-            "bix":i-state["buf_ix0"],
+            "bix":i-state["buf_ixs"],
         });
     }
-    Promise.all([buf_urls.map(getImagePromise)]).then((v) => {
-        console.log(v);
+    Promise.allSettled(buf_urls.map(getImagePromise)).then((v) => {
         state["frozen"] -= 1;
-        console.log(state["tick_active"]);
+        // continue looping if the button was initially called while looping
         if (state["tick_active"] == null) {
             //setActiveTicker[buf_urls[buf_urls.length-1]["key"]];
             setActiveTicker(buf_urls[0]["key"]);
         }
+        else {
+            // 
+            let prev_active = buf_urls.find(
+                (m) => m["key"] == state["tick_active"])
+            console.log(prev_active);
+            if (prev_active == undefined) {
+                setActiveTicker(buf_urls[0]["key"]);
+            }
+            else {
+                setActiveTicker(prev_active["key"]);
+            }
+        }
+        console.log(state["image_buffer"]);
+        if (was_looping) { toggleBufferLoop(); }
     });
 })
 
-function setActiveTicker(tick_key){
-    if (state["tick_active"] != null){
-        let prev_bix = state["image_buffer"][state["tick_active"]]["bix"];
-        let prev_tick = $main_container_ticker.childNodes[prev_bix];
-        prev_tick.classList.remove("buffer-ticker-active");
-        prev_tick.classList.add("buffer-ticker-inactive");
-    }
-    let buf = state["image_buffer"];
-    console.log(buf);
-    console.log(tick_key);
-    let bix = state["image_buffer"][tick_key]["bix"];
-    let tick = $main_container_ticker.childNodes[bix];
-    tick.classList.remove("buffer-ticker-inactive");
-    tick.classList.add("buffer-ticker-active");
-    state["tick_active"] = tick_key;
-    /*
-    main_ctx.drawImage(state["image_buffer"][tick_key]["img"],
-        0, 0, $main_canvas.width, $main_canvas.height);
-        */
-    D.getElementById("main_img").src = state["image_buffer"][tick_key]["img"].src;
-    console.log(tick);
-}
+/* ---------------( Image Buffer Operations )--------------- */
 
 function getImagePromise(key_url_bix){
     return new Promise((resolve, reject) => {
@@ -379,3 +410,50 @@ function getImagePromise(key_url_bix){
     });
 }
 
+function setActiveTicker(tick_key){
+    if ((state["tick_active"] != null)
+            && (state["tick_active"] in state["image_buffer"])){
+        let prev_bix = state["image_buffer"][state["tick_active"]]["bix"];
+        console.log(prev_bix);
+        let prev_tick = $main_container_ticker.childNodes[prev_bix];
+        prev_tick.classList.remove("buffer-ticker-active");
+        prev_tick.classList.add("buffer-ticker-inactive");
+    }
+    let buf = state["image_buffer"];
+    let bix = state["image_buffer"][tick_key]["bix"];
+    let tick = $main_container_ticker.childNodes[bix];
+    tick.classList.remove("buffer-ticker-inactive");
+    tick.classList.add("buffer-ticker-active");
+    state["tick_active"] = tick_key;
+    $main_label_active.innerText = tick_key;
+
+    /*
+    main_ctx.drawImage(state["image_buffer"][tick_key]["img"],
+        0, 0, $main_canvas.width, $main_canvas.height);
+        */
+
+    D.getElementById("main_img").src = state["image_buffer"][tick_key]["img"].src;
+}
+
+function bufferStep(step=1) {
+    if (state["tick_active"]==null){return;}
+    let cur_ix = state["image_buffer"][state["tick_active"]]["bix"];
+    let buf_size = $main_container_ticker.childNodes.length;
+    let next_ix = (buf_size + cur_ix + step) % buf_size;
+    setActiveTicker($main_container_ticker.childNodes[next_ix].title);
+}
+
+function toggleBufferLoop() {
+    // Ignore toggle operations if images are loading
+    if (state["frozen"] > 0){ return; }
+    let fd = $buffer_input_framedelay.value;
+    if (state["looping"]) {
+        clearInterval(cycle_handle);
+        cycle_handle = 0;
+        state["looping"] = false;
+    }
+    else {
+        cycle_handle = setInterval(()=>bufferStep(1), fd);
+        state["looping"] = true;
+    }
+}

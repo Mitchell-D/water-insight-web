@@ -72,19 +72,19 @@ aux_datafeats = {
         "trans":{
             "long_title":"Plant Transpiration",
             "short_title":"Transpiration",
-            "Unit":"W / m^2",
+            "unit":"W / m^2",
             "default_metric":"mean",
             },
         "ssrun":{
             "long_title":"Surface Runoff",
             "short_title":"Surface Runoff",
-            "Unit":"kg / m^2",
+            "unit":"kg / m^2",
             "default_metric":"total",
             },
         "bgrun":{
             "long_title":"Subsurface Runoff",
             "short_title":"Subsurface Runoff",
-            "Unit":"kg / m^2",
+            "unit":"kg / m^2",
             "default_metric":"total",
             },
         }

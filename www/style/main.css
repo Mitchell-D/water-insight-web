@@ -1,16 +1,10 @@
 /*
 display prop types: https://www.w3schools.com/cssref/pr_class_display.php
 */
-.wv-button {
-    background-color:#f6b26b;
-    color:#000000;  /* text color */
-    border: .2rem solid #e69138; /* size type color */
-    padding: 10px 20px; /* top/bottom interior pad (adaptive args) */
-    text-align:center; /* horizontal alignment in a div */
-    display:inline-block; /* element rendering box behavior */
-    font-size:14px; 
-}
 
+#menu_container_timeres {
+    padding: 0px 40px;
+}
 .menu-radio-label-name {
     margin-bottom: 0px;
 }
@@ -27,9 +21,15 @@ display prop types: https://www.w3schools.com/cssref/pr_class_display.php
     width:85%;
     padding:10px 20px;
     margin:0px 20px;
+    background-color:#0d6efd;
+    color:white;
 }
 #menu_radio_container {
     padding:0px 20px;
+}
+#sidebar_menu {
+    background-color:#e9ecef;
+    overflow-x:hidden;
 }
 .menu-dropdown-label {
     margin-bottom:0px;
@@ -39,12 +39,28 @@ display prop types: https://www.w3schools.com/cssref/pr_class_display.php
     max-height:200px;
     overflow-y:scroll;
 }
+.menu-container-numform {
+    width:85%;
+    margin:0px 20px;
+}
 .menu-numform-label {
     width:100px;
 }
-
+#menu_date_range {
+    padding:10px 10px;
+    margin:0px 10px;
+    width:80%;
+}
+#menu_submit_button {
+    color:white;
+    font-weight:bold;
+    font-size:1.2em;
+    width:80%;
+    padding:10px 10px;
+    margin:10px 10px;
+}
 body {
-    /*background-image:url("../images/background-reduced.png");*/
+    background-image:url("../images/background-reduced.png");
     background-position: top;
     background-repeat: repeat;
     background-size: cover;
@@ -53,18 +69,58 @@ body {
     /*background-color:#0d3861;*/
     background-color: black;
 }
-.buffer-ticker-inactive {
+
+#main_col_header {
+    background-color:#e9ecef;
+}
+#main_col_buffer {
+    background-color:#e9ecef;
+}
+#main_header_text {
+    font-size:1.2em;
+    margin: 0px;
+}
+
+#main_container_ticker {
+    max-height:150px;
+    overflow-y:scroll;
+    overflow-x:hidden;
+}
+.buffer-ticker {
     width:15px;
     height:15px;
-    background:rgb(255, 255, 255);
+    margin:1px 1px;
 }
-.buffer-ticker-disabled {
-    width:15px;
-    height:15px;
-    background:rgb(52, 51, 51);
+.buffer-ticker-inactive { background:rgb(255, 255, 255); }
+.buffer-ticker-disabled { background:rgb(52, 51, 51); }
+.buffer-ticker-active { background:#0d6efd; }
+.buffer-button {
+    background-color:#0d6efd;
+    width:25%;
+    height:40px;
 }
-.buffer-ticker-active {
-    width:15px;
-    height:15px;
-    background:#0d6efd;
+.buffer-fa-span {
+    color: #ffffff;
+    text-shadow: 1px 1px 1px #ccc;
+    font-size: 1.2em;
+    vertical-align:middle;
 }
+#buffer_label_framedelay {
+    margin: 0px 10px;
+    align-items: center;
+    display:flex;
+}
+#buffer_input_framedelay {
+    max-width:250px;
+    min-width:150px;
+    margin: 10px 10px;
+}
+
+canvas {
+    image-rendering: optimizeSpeed;             /* Older versions of FF          */
+    image-rendering: -moz-crisp-edges;          /* FF 6.0+                       */
+    image-rendering: -webkit-optimize-contrast; /* Safari                        */
+    image-rendering: -o-crisp-edges;            /* OS X & Windows Opera (12.02+) */
+    image-rendering: pixelated;                 /* Awesome future-browsers       */
+    -ms-interpolation-mode: nearest-neighbor;   /* IE                            */
+  }
