@@ -1,6 +1,8 @@
+import json
+import matplotlib.pyplot as plt
+import numpy as np
 from pathlib import Path
 from datetime import datetime
-import json
 
 aux_datafeats = {
         "weasd":{
@@ -100,7 +102,7 @@ aux_timeres = {
 
 
 if __name__=="__main__":
-    image_dir = Path("/rstor/mdodson/timegrid_frames/rgbs")
+    image_dir = Path("/rstor/mdodson/timegrid_frames/rgbs2")
     feed_dir = Path("/rhome/mdodson/water-insight-web/listing")
     default_norm_path = feed_dir.joinpath("cmap_default_norms.json")
     def_norms = json.load(default_norm_path.open("r"))
@@ -118,7 +120,7 @@ if __name__=="__main__":
         if ml not in feed[rl][fl].keys():
             feed[rl][fl][ml] = []#{"etimes":[], "paths":[], "stimes":[]}
 
-        etime = datetime.strptime(stime,"%Y%m%d-%H%M").strftime("%s")
+        etime = datetime.strptime(stime,"%Y%m%d").strftime("%s")
         feed[rl][fl][ml].append({"etime":etime,"stime":stime,"fname":p.name})
 
     ## generate datafeed json for each resolution/feature/metric combo
@@ -139,5 +141,33 @@ if __name__=="__main__":
     #'''
 
     ## generate JSON files for the static auxiliary information
+    #'''
     json.dump(aux_datafeats, feed_dir.joinpath("aux_datafeats.json").open("w"))
     json.dump(aux_timeres, feed_dir.joinpath("aux_timeres.json").open("w"))
+    #'''
+
+    ## ugly way to get color map jsons with unique values at each point
+    '''
+    cmaps = ["nipy_spectral", "gnuplot", "gnuplot2", "gist_rainbow",
+            "gist_earth", "coolwarm", "inferno", "viridis"]
+    for cm in cmaps:
+        res = 512
+        while True:
+            ca = plt.get_cmap(cm)(
+                    np.linspace(0,1, res),
+                    bytes=True,
+                    )[:,:3].astype(int)
+            ca = [tuple(ca[i,:]) for i in range(ca.shape[0])]
+            if len(ca) == len(set(ca)):
+                break
+            res -= 1
+        cmjson = {
+                "name":cm,
+                "map":[list(map(int,x)) for x in ca],
+                "mins":[int(x) for x in np.amin(ca, axis=0)],
+                "maxs":[int(x) for x in np.amax(ca, axis=0)],
+                }
+        print(f"saving {cm} with resolution {res}")
+        json.dump(cmjson, feed_dir.joinpath(
+            f"cmap_{cm.replace('_','-')}.json").open("w"))
+    '''

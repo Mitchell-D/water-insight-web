@@ -26,7 +26,7 @@
 ### Ouput files
 ###SBATCH --open-mode=append ### Don't overwrite existing files
 #SBATCH -o /rhome/mdodson/water-insight-web/slurm/out/slurm_update_datafeed.out # STDOUT
-#SBATCH -o /rhome/mdodson/water-insight-web/slurm/out/slurm_update_datafeed.err # STDOUT
+#SBATCH -e /rhome/mdodson/water-insight-web/slurm/out/slurm_update_datafeed.err # STDOUT
 
 cd /rhome/mdodson/water-insight-web
 
