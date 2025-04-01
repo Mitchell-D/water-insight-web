@@ -1,6 +1,8 @@
+import json
+import matplotlib.pyplot as plt
+import numpy as np
 from pathlib import Path
 from datetime import datetime
-import json
 
 aux_datafeats = {
         "weasd":{
@@ -107,7 +109,7 @@ if __name__=="__main__":
 
     ## collect a tree of all available images according to their time
     ## resolution, data feature, and data metric.
-    #'''
+    '''
     feed = {}
     for p in image_dir.iterdir():
         _,rl,stime,fl,ml = p.stem.split("_")
@@ -136,8 +138,46 @@ if __name__=="__main__":
                 print(f"Generated {feed_path.as_posix()}")
                 menu[rl][fl].append({"name":ml, "vrange":def_norms[fl][ml]})
     json.dump(menu, feed_dir.joinpath("datamenu.json").open("w"))
-    #'''
+    '''
 
     ## generate JSON files for the static auxiliary information
+    '''
     json.dump(aux_datafeats, feed_dir.joinpath("aux_datafeats.json").open("w"))
     json.dump(aux_timeres, feed_dir.joinpath("aux_timeres.json").open("w"))
+    '''
+
+    ## ugly way to get color map jsons with unique values at each point
+    '''
+    cmaps = ["nipy_spectral", "gnuplot", "gnuplot2", "gist_rainbow",
+            "gist_earth", "coolwarm", "inferno", "viridis"]
+    for cm in cmaps:
+        res = 512
+        while True:
+            ca = plt.get_cmap(cm)(
+                    np.linspace(0,1, res),
+                    bytes=True,
+                    )[:,:3].astype(int)
+            ca = [tuple(ca[i,:]) for i in range(ca.shape[0])]
+            if len(ca) == len(set(ca)):
+                break
+            res -= 1
+        cmjson = {
+                "name":cm,
+                "map":[list(map(int,x)) for x in ca],
+                "mins":[int(x) for x in np.amin(ca, axis=0)],
+                "maxs":[int(x) for x in np.amax(ca, axis=0)],
+                }
+        print(f"saving {cm} with resolution {res}")
+        json.dump(cmjson, feed_dir.joinpath(
+            f"cmap_{cm.replace('_','-')}.json").open("w"))
+    '''
+
+    rgb_dir = Path("/rstor/mdodson/timegrid_frames/rgbs")
+    for p in rgb_dir.iterdir():
+        if "tgframe_20" in p.name:
+            newname = list(p.stem.split("_"))
+            newname.insert(1,"conus-daily")
+            p.rename(rgb_dir.joinpath("_".join(newname)+".png"))
+        elif "tgframe_daily" in p.name:
+            newname = p.name.replace("daily","conus-daily")
+            p.rename(rgb_dir.joinpath(newname))
