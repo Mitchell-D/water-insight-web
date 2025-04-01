@@ -8,6 +8,8 @@ let state = {
     "datamenu":null,
     "aux_feats":null,
     "aux_res":null,
+    "latlon":null,
+    "cmap":null,
 
     // currrently-selected menu options
     "sel_res":null,
@@ -38,7 +40,8 @@ let D = document;
 let $t_time_res_radio = D.getElementById("radio_time_res_temp");
 let $t_menu_dropdown = D.getElementById("menu_dropdown");
 let $t_ticker = D.getElementById("ticker_template");
-//let $main_canvas = D.getElementById("main_canvas");
+let $main_canvas = D.getElementById("main_canvas");
+//let $main_img = D.getElementById("main_img");
 let $main_container_ticker = D.getElementById("main_container_ticker");
 let $main_label_active = D.getElementById("main_label_active");
 let $main_header_text = D.getElementById("main_header_text");
@@ -55,9 +58,10 @@ let $menu_dropdown_feat = D.getElementById("menu_dropdown_feat");
 let $menu_dropdown_metric = D.getElementById("menu_dropdown_metric");
 let $menu_date_range = D.getElementById("menu_date_range");
 let $menu_submit_button = D.getElementById("menu_submit_button");
+let $display_wrapper_inner = D.getElementById("display_wrapper_inner");
 
-//const main_ctx = $main_canvas.getContext("2d");
-//main_ctx.imageSmoothingEnabled = false;
+const main_ctx = $main_canvas.getContext("2d", {"alpha":false});
+main_ctx.imageSmoothingEnabled = false;
 
 /* ---------------( Menu Update Functions )--------------- */
 
@@ -306,16 +310,27 @@ function cap(val) {
 /* ---------------( Event Listeners )--------------- */
 
 D.addEventListener("DOMContentLoaded", async function(){
+    // acquire required data
     const listing = await Promise.all([
         fetchJSON("../listing/aux_datafeats.json"),
         fetchJSON("../listing/aux_timeres.json"),
         fetchJSON("../listing/datamenu.json"),
+        fetchJSON("../listing/latlon.json"),
+        fetchJSON("../listing/cmap_nipy-spectral.json"),
     ]);
     state["aux_feats"] = listing[0];
     state["aux_res"] = listing[1];
     state["datamenu"] = listing[2];
+    state["latlon"] = listing[3];
+    state["cmap"] = listing[4];
     loadMenuTimeRes(true);
 })
+
+// always match the svg size to the canvas size.
+window.onresize = function() {
+    main_svg.attr("width", $main_canvas.offsetWidth);
+    main_svg.attr("height", $main_canvas.offsetHeight);
+  };
 
 $buffer_button_next.addEventListener("click", () => { bufferStep(1); })
 $buffer_button_prev.addEventListener("click", () => { bufferStep(-1); })
@@ -369,7 +384,6 @@ $menu_submit_button.addEventListener("click", async ()=>{
             // 
             let prev_active = buf_urls.find(
                 (m) => m["key"] == state["tick_active"])
-            console.log(prev_active);
             if (prev_active == undefined) {
                 setActiveTicker(buf_urls[0]["key"]);
             }
@@ -377,7 +391,6 @@ $menu_submit_button.addEventListener("click", async ()=>{
                 setActiveTicker(prev_active["key"]);
             }
         }
-        console.log(state["image_buffer"]);
         if (was_looping) { toggleBufferLoop(); }
     });
 })
@@ -414,7 +427,6 @@ function setActiveTicker(tick_key){
     if ((state["tick_active"] != null)
             && (state["tick_active"] in state["image_buffer"])){
         let prev_bix = state["image_buffer"][state["tick_active"]]["bix"];
-        console.log(prev_bix);
         let prev_tick = $main_container_ticker.childNodes[prev_bix];
         prev_tick.classList.remove("buffer-ticker-active");
         prev_tick.classList.add("buffer-ticker-inactive");
@@ -427,12 +439,12 @@ function setActiveTicker(tick_key){
     state["tick_active"] = tick_key;
     $main_label_active.innerText = tick_key;
 
-    /*
+    ///*
     main_ctx.drawImage(state["image_buffer"][tick_key]["img"],
         0, 0, $main_canvas.width, $main_canvas.height);
-        */
+    //    */
 
-    D.getElementById("main_img").src = state["image_buffer"][tick_key]["img"].src;
+    //D.getElementById("main_img").src = state["image_buffer"][tick_key]["img"].src;
 }
 
 function bufferStep(step=1) {
@@ -457,3 +469,15 @@ function toggleBufferLoop() {
         state["looping"] = true;
     }
 }
+
+/* ---------------( D3JS stuff )--------------- */
+
+const main_svg = d3.select($display_wrapper_inner)
+    .append("svg")
+    .attr("width", $main_canvas.offsetWidth)
+    .attr("height", $main_canvas.offsetHeight)
+    .attr("id", "main_svg")
+    .style("position", "absolute")
+    .style("top", "0px")
+    .style("left", "0px")
+    .style("margin", "0px 12px");

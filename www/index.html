@@ -10,6 +10,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="style/main.css">
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://d3js.org/topojson.v2.min.js"></script>
 </head>
 <body>
     <header class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
@@ -109,25 +111,23 @@
                 <div class="col-md-1"></div>
                 <div class="col-md-10" id="main_col_header">
                     <div class="row text-center">
-                        <p id="main_header_text"></p>
+                        <p id="main_header_text">---</p>
                     </div>
-                </div>
-                <div class="col-md-1"></div>
-            </div>
-            <div class="row" id="main_canvas_row">
-                <!--<canvas class="my-4 w-100" id="main_canvas" style="display: block;"></canvas>-->
-                <img class="my-4 w-100" id="main_img" style="display: block;"></img>
-            </div>
-            <div class="row">
-                <div class="col-md-1"></div>
-                <div class="col-md-10" id="main_col_buffer">
+                    <div class="row" id="main_canvas_row">
+                        <div id="display_wrapper_outer">
+                            <div id="display_wrapper_inner">
+                                <!--<img id="main_img" style="display: block;"></img>-->
+                                <canvas id="main_canvas" style="display: block;"></canvas>
+                            </div>
+                        </div>
+                    </div>
                     <div class="row">
                         <h6 id="main_label_active" class="text-center"></h6>
                     </div>
                     <div class="row">
                         <div id="main_container_ticker" class="d-flex flex-wrap p-2 justify-content-center align-items-center"></div>
                     </div>
-                    <div class="row" id="">
+                    <div class="row" id="buffer_forms">
                         <div class="col-xl-4 align-self-center">
                         </div>
                         <div class="col-xl-4 align-self-center">
@@ -148,7 +148,7 @@
                             <div class="row">
                                 <div class="input-group justify-content-center" id="buffer_container_framedelay">
                                     <label for="buffer_input_framedelay" class="form-label" id="buffer_label_framedelay">Frame Delay (ms)</label>
-                                    <input id="buffer_input_framedelay" class="text-center form-control" type="number" step=10 min=10 value=200 max=5000></input>
+                                    <input id="buffer_input_framedelay" class="text-center form-control" type="number" step=10 min=10 value=100 max=5000></input>
                                 </div>
                             </div>
                         </div>

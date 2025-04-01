@@ -80,7 +80,29 @@ body {
     font-size:1.2em;
     margin: 0px;
 }
-
+/*
+#main_img {
+    width:100%;
+    height:100%;
+    position:absolute;
+    top:0px;
+    left:0px;
+}
+*/
+#main_svg {
+    /*cursor:url(../images/crosshair-small.png) 16 16, auto;*/
+    cursor:url(../images/crosshair-xsmall.png) 8 8, auto;
+}
+#display_wrapper_outer {
+    position: relative;
+}
+#main_canvas {
+    width:100%;
+    height:100%;
+    /*position:absolute;*/
+    top:0px;
+    left:0px;
+}
 #main_container_ticker {
     max-height:150px;
     overflow-y:scroll;
