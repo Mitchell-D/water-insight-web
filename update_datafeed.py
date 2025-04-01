@@ -112,16 +112,19 @@ if __name__=="__main__":
     #'''
     feed = {}
     for p in image_dir.iterdir():
-        _,rl,stime,fl,ml = p.stem.split("_")
+        _,rl,tl,stime,fl,ml = p.stem.split("_")
         if rl not in feed.keys():
             feed[rl] = {}
-        if fl not in feed[rl].keys():
-            feed[rl][fl] = {}
-        if ml not in feed[rl][fl].keys():
-            feed[rl][fl][ml] = []#{"etimes":[], "paths":[], "stimes":[]}
+        if tl not in feed[rl].keys():
+            feed[rl][tl] = {}
+        if fl not in feed[rl][tl].keys():
+            feed[rl][tl][fl] = {}
+        if ml not in feed[rl][tl][fl].keys():
+            feed[rl][tl][fl][ml] = []#{"etimes":[], "paths":[], "stimes":[]}
 
         etime = datetime.strptime(stime,"%Y%m%d").strftime("%s")
-        feed[rl][fl][ml].append({"etime":etime,"stime":stime,"fname":p.name})
+        feed[rl][tl][fl][ml].append(
+                {"etime":etime,"stime":stime,"fname":p.name})
 
     ## generate datafeed json for each resolution/feature/metric combo
     ## and a single menu json with default norm bounds for all combos
@@ -129,14 +132,24 @@ if __name__=="__main__":
     for rl in feed.keys():
         if rl not in menu.keys():
             menu[rl] = {}
-        for fl in feed[rl].keys():
-            menu[rl][fl] = []
-            for ml in feed[rl][fl].keys():
-                available = sorted(feed[rl][fl][ml], key=lambda s:s["etime"])
-                feed_path = feed_dir.joinpath(f"datafeed_{rl}_{fl}_{ml}.json")
-                json.dump(available, feed_path.open("w"))
-                print(f"Generated {feed_path.as_posix()}")
-                menu[rl][fl].append({"name":ml, "vrange":def_norms[fl][ml]})
+        for tl in feed[rl].keys():
+            if tl not in menu[rl].keys():
+                menu[rl][tl] = {}
+            for fl in feed[rl][tl].keys():
+                menu[rl][tl][fl] = []
+                for ml in feed[rl][tl][fl].keys():
+                    available = sorted(
+                            feed[rl][tl][fl][ml],
+                            key=lambda s:s["etime"]
+                            )
+                    feed_path = feed_dir.joinpath(
+                            f"datafeed_{rl}_{tl}_{fl}_{ml}.json")
+                    json.dump(available, feed_path.open("w"))
+                    print(f"Generated {feed_path.as_posix()}")
+                    menu[rl][tl][fl].append({
+                        "name":ml,
+                        "vrange":def_norms[fl][ml]
+                        })
     json.dump(menu, feed_dir.joinpath("datamenu.json").open("w"))
     #'''
 
