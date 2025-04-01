@@ -1,5 +1,6 @@
 let state = {
     "menu_defaults":{
+        "region":"conus",
         "res":"daily",
         "feat":"soilm-10",
         "metric":"mean",
@@ -12,6 +13,7 @@ let state = {
     "cmap":null,
 
     // currrently-selected menu options
+    "sel_region":null,
     "sel_res":null,
     "sel_feat":null,
     "sel_metric":null,
@@ -38,6 +40,7 @@ var cycle_handle = null;
 
 let D = document;
 let $t_time_res_radio = D.getElementById("radio_time_res_temp");
+let $t_region_radio = D.getElementById("radio_region_temp");
 let $t_menu_dropdown = D.getElementById("menu_dropdown");
 let $t_ticker = D.getElementById("ticker_template");
 let $main_canvas = D.getElementById("main_canvas");
@@ -49,6 +52,7 @@ let $buffer_button_prev = D.getElementById("buffer_button_prev");
 let $buffer_button_toggle = D.getElementById("buffer_button_toggle");
 let $buffer_button_next = D.getElementById("buffer_button_next");
 let $buffer_input_framedelay = D.getElementById("buffer_input_framedelay");
+let $menu_container_region = D.getElementById("menu_container_region");
 let $menu_container_timeres = D.getElementById("menu_container_timeres");
 let $menu_container_feat = D.getElementById("menu_container_feat");
 let $menu_container_metric = D.getElementById("menu_container_metric");
@@ -71,8 +75,28 @@ If this is the initial load, get the checked state from the menu defaults.
 
 I don't think this should ever be called except for initial page load.
 */
+function loadMenuRegion(initial_load=false){
+    for (const k in state["datamenu"]) {
+        let tmp_radio = $t_region_radio.content.cloneNode(true);
+        tmp_radio.querySelector(".menu-radio-label-name").textContent = k;
+        // set default value to checked per the menu state
+        if (initial_load && (k==state["menu_defaults"]["region"])) {
+            tmp_radio.querySelector(".menu-radio-checkbox").checked = true;
+            state["sel_region"] = k;
+        }
+        tmp_radio.querySelector(".menu-radio-checkbox").value= k;
+        tmp_radio.querySelector(".menu-radio-checkbox").onclick = function(v){
+            state["sel_region"] = v.target.value;
+            loadMenuTimeRes();
+        }
+        $menu_container_region.append(tmp_radio);
+    }
+    loadMenuTimeRes(initial_load);
+}
 function loadMenuTimeRes(initial_load=false){
-    for (const k in state["aux_res"]) {
+    //for (const k in state["aux_res"]) {
+    for (const k in state["datamenu"][state["sel_region"]]) {
+        console.log(k);
         let tmp_radio = $t_time_res_radio.content.cloneNode(true);
         /*
         // load date
@@ -147,7 +171,9 @@ function setDataFeatState(new_state, initial_load=false) {
 // load the metrics dropdown and set the current value;
 // behavior depends on the current sel_feat state.
 function loadMenuDataMetrics(initial_load=false) {
-    let metrics = state["datamenu"][state["sel_res"]][state["sel_feat"]];
+    console.log(state);
+    let feats = state["datamenu"][state["sel_region"]][state["sel_res"]];
+    let metrics = feats[state["sel_feat"]]
     let prev_metric_included = false;
     $menu_container_metric.querySelector("ul").replaceChildren();
     for (let tmpm of metrics) {
@@ -190,7 +216,8 @@ function loadDataFeed(){
     // Use the current selection state to determine the datafeed to retrieve
     //feed_str = `${state["sel_res"]}_${state["sel_feat"]}_${state["sel_metric"]}`
     let feed_fields = [
-        "datafeed",state["sel_res"],state["sel_feat"],state["sel_metric"].name
+        "datafeed",state["sel_region"],state["sel_res"],
+        state["sel_feat"],state["sel_metric"].name
     ]
     let furl = `../listing/${feed_fields.join("_")}.json`
     // Fetch the datafeed JSON and update date selection and image buffer
@@ -323,7 +350,8 @@ D.addEventListener("DOMContentLoaded", async function(){
     state["datamenu"] = listing[2];
     state["latlon"] = listing[3];
     state["cmap"] = listing[4];
-    loadMenuTimeRes(true);
+    //loadMenuTimeRes(true);
+    loadMenuRegion(true);
 })
 
 // always match the svg size to the canvas size.

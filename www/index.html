@@ -33,9 +33,14 @@
         <div class="row">
         <nav id="sidebar_menu" class="col-md-4 col-lg-3 d-md-block sidebar collapse">
             <div class="position-sticky pt-3">
+                <div class="row" id="menu_region_row">
+                    <p class="text-center menu-section-title">Region</p>
+                    <div class="menu-container-radio" id="menu_container_region"></div>
+                </div>
+                <hr/>
                 <div class="row" id="menu_time_resolution_row">
                     <p class="text-center menu-section-title">Time Resolution</p>
-                    <div id="menu_container_timeres"></div>
+                    <div class="menu-container-radio" id="menu_container_timeres"></div>
                 </div>
                 <hr/>
                 <div class="row" id="menu_data_selection_row">
@@ -160,6 +165,15 @@
             <div class="table-responsive">
             </div>
     </div>
+    <template id="radio_region_temp">
+        <div class="form-check">
+            <input class="form-check-input menu-radio-checkbox" type="radio" name="regionMenuRadio">
+            <label class="form-check-label" for="regionMenuRadio">
+                <p class="menu-radio-label-name"></p>
+                <p class="menu-radio-date-range"></p>
+            </label>
+        </div>
+    </template>
     <template id="radio_time_res_temp">
         <div class="form-check">
             <input class="form-check-input menu-radio-checkbox" type="radio" name="resMenuRadio">
