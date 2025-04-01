@@ -74,19 +74,19 @@ aux_datafeats = {
         "trans":{
             "long_title":"Plant Transpiration",
             "short_title":"Transpiration",
-            "Unit":"W / m^2",
+            "unit":"W / m^2",
             "default_metric":"mean",
             },
         "ssrun":{
             "long_title":"Surface Runoff",
             "short_title":"Surface Runoff",
-            "Unit":"kg / m^2",
+            "unit":"kg / m^2",
             "default_metric":"total",
             },
         "bgrun":{
             "long_title":"Subsurface Runoff",
             "short_title":"Subsurface Runoff",
-            "Unit":"kg / m^2",
+            "unit":"kg / m^2",
             "default_metric":"total",
             },
         }
@@ -102,14 +102,14 @@ aux_timeres = {
 
 
 if __name__=="__main__":
-    image_dir = Path("/rstor/mdodson/timegrid_frames/rgbs")
+    image_dir = Path("/rstor/mdodson/timegrid_frames/rgbs2")
     feed_dir = Path("/rhome/mdodson/water-insight-web/listing")
     default_norm_path = feed_dir.joinpath("cmap_default_norms.json")
     def_norms = json.load(default_norm_path.open("r"))
 
     ## collect a tree of all available images according to their time
     ## resolution, data feature, and data metric.
-    '''
+    #'''
     feed = {}
     for p in image_dir.iterdir():
         _,rl,stime,fl,ml = p.stem.split("_")
@@ -120,7 +120,7 @@ if __name__=="__main__":
         if ml not in feed[rl][fl].keys():
             feed[rl][fl][ml] = []#{"etimes":[], "paths":[], "stimes":[]}
 
-        etime = datetime.strptime(stime,"%Y%m%d-%H%M").strftime("%s")
+        etime = datetime.strptime(stime,"%Y%m%d").strftime("%s")
         feed[rl][fl][ml].append({"etime":etime,"stime":stime,"fname":p.name})
 
     ## generate datafeed json for each resolution/feature/metric combo
@@ -138,13 +138,13 @@ if __name__=="__main__":
                 print(f"Generated {feed_path.as_posix()}")
                 menu[rl][fl].append({"name":ml, "vrange":def_norms[fl][ml]})
     json.dump(menu, feed_dir.joinpath("datamenu.json").open("w"))
-    '''
+    #'''
 
     ## generate JSON files for the static auxiliary information
-    '''
+    #'''
     json.dump(aux_datafeats, feed_dir.joinpath("aux_datafeats.json").open("w"))
     json.dump(aux_timeres, feed_dir.joinpath("aux_timeres.json").open("w"))
-    '''
+    #'''
 
     ## ugly way to get color map jsons with unique values at each point
     '''
@@ -171,13 +171,3 @@ if __name__=="__main__":
         json.dump(cmjson, feed_dir.joinpath(
             f"cmap_{cm.replace('_','-')}.json").open("w"))
     '''
-
-    rgb_dir = Path("/rstor/mdodson/timegrid_frames/rgbs")
-    for p in rgb_dir.iterdir():
-        if "tgframe_20" in p.name:
-            newname = list(p.stem.split("_"))
-            newname.insert(1,"conus-daily")
-            p.rename(rgb_dir.joinpath("_".join(newname)+".png"))
-        elif "tgframe_daily" in p.name:
-            newname = p.name.replace("daily","conus-daily")
-            p.rename(rgb_dir.joinpath(newname))
