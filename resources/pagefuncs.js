@@ -110,6 +110,7 @@ function loadMenuRegion(initial_load=false){
 }
 function loadMenuTimeRes(initial_load=false){
     //for (const k in state["aux_res"]) {
+    $menu_container_timeres.replaceChildren();
     for (const k in state["datamenu"][state["sel_region"]]) {
         console.log(k);
         let tmp_radio = $t_time_res_radio.content.cloneNode(true);
@@ -129,6 +130,9 @@ function loadMenuTimeRes(initial_load=false){
         if (initial_load && (k==state["menu_defaults"]["res"])) {
             tmp_radio.querySelector(".menu-radio-checkbox").checked = true;
             state["sel_res"] = k;
+        }
+        else if (k==state["sel_res"]){
+            tmp_radio.querySelector(".menu-radio-checkbox").checked = true;
         }
         tmp_radio.querySelector(".menu-radio-checkbox").value= k;
         tmp_radio.querySelector(".menu-radio-checkbox").onclick = function(v){
