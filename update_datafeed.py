@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from pathlib import Path
 from datetime import datetime
+from collections import OrderedDict
 
 aux_datafeats = {
         "weasd":{
@@ -100,6 +101,14 @@ aux_timeres = {
             },
         }
 
+feat_order = [
+        "apcp", "weasd",
+        "soilm-10", "soilm-40", "soilm-100", "soilm-200",
+        "ssrun", "bgrun", "trans", "evbs",
+        "rsm-10", "rsm-40", "rsm-100", "rsm-200",
+        ]
+
+metric_order = ["mean", "min", "max", "stdev", "sum-or-diff"]
 
 if __name__=="__main__":
     image_dir = Path("/rstor/mdodson/timegrid_frames/rgbs2")
@@ -128,16 +137,18 @@ if __name__=="__main__":
 
     ## generate datafeed json for each resolution/feature/metric combo
     ## and a single menu json with default norm bounds for all combos
-    menu = {}
+    menu = OrderedDict()
     for rl in feed.keys():
         if rl not in menu.keys():
-            menu[rl] = {}
+            menu[rl] = OrderedDict()
         for tl in feed[rl].keys():
             if tl not in menu[rl].keys():
-                menu[rl][tl] = {}
-            for fl in feed[rl][tl].keys():
+                menu[rl][tl] = OrderedDict()
+            for fl in sorted(list(feed[rl][tl].keys()),
+                    key=lambda k:feat_order.index(k)):
                 menu[rl][tl][fl] = []
-                for ml in feed[rl][tl][fl].keys():
+                for ml in sorted(list(feed[rl][tl][fl].keys()),
+                        key=lambda k:metric_order.index(k)):
                     available = sorted(
                             feed[rl][tl][fl][ml],
                             key=lambda s:s["etime"]
