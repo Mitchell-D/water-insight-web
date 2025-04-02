@@ -2,7 +2,7 @@
 display prop types: https://www.w3schools.com/cssref/pr_class_display.php
 */
 
-#menu_container_timeres {
+.menu-container-radio {
     padding: 0px 40px;
 }
 .menu-radio-label-name {
