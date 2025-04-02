@@ -11,6 +11,9 @@ let state = {
     "aux_res":null,
     "latlon":null,
     "cmap":null,
+    "borders":{
+        "conus":null,
+    },
 
     // currrently-selected menu options
     "sel_region":null,
@@ -66,6 +69,18 @@ let $display_wrapper_inner = D.getElementById("display_wrapper_inner");
 
 const main_ctx = $main_canvas.getContext("2d", {"alpha":false});
 main_ctx.imageSmoothingEnabled = false;
+
+const d3_main_svg = d3.select($display_wrapper_inner)
+    .append("svg")
+    .attr("width", $main_canvas.offsetWidth)
+    .attr("height", $main_canvas.offsetHeight)
+    .attr("id", "main_svg")
+    .style("position", "absolute")
+    .style("top", "0px")
+    .style("left", "0px")
+    .style("margin", "0px 12px");
+
+let $main_svg = D.getElementById("main_svg");
 
 /* ---------------( Menu Update Functions )--------------- */
 
@@ -128,7 +143,7 @@ function loadMenuTimeRes(initial_load=false){
 // Load the data feats dropdown and set the current value
 // behavior depends on the current time_res state.
 function loadMenuDataFeats(initial_load=false) {
-    let feats = state["datamenu"][state["sel_res"]];
+    let feats = state["datamenu"][state["sel_region"]][state["sel_res"]];
     $menu_container_feat.querySelector("ul").replaceChildren();
     for (fk in feats) {
         let tmp_dd = $t_menu_dropdown.content.cloneNode(true);
@@ -171,7 +186,6 @@ function setDataFeatState(new_state, initial_load=false) {
 // load the metrics dropdown and set the current value;
 // behavior depends on the current sel_feat state.
 function loadMenuDataMetrics(initial_load=false) {
-    console.log(state);
     let feats = state["datamenu"][state["sel_region"]][state["sel_res"]];
     let metrics = feats[state["sel_feat"]]
     let prev_metric_included = false;
@@ -344,20 +358,25 @@ D.addEventListener("DOMContentLoaded", async function(){
         fetchJSON("../listing/datamenu.json"),
         fetchJSON("../listing/latlon.json"),
         fetchJSON("../listing/cmap_nipy-spectral.json"),
+        fetchJSON("../listing/borders_conus.json")
     ]);
     state["aux_feats"] = listing[0];
     state["aux_res"] = listing[1];
     state["datamenu"] = listing[2];
     state["latlon"] = listing[3];
     state["cmap"] = listing[4];
+    state["borders"]["conus"] = listing[5];
     //loadMenuTimeRes(true);
     loadMenuRegion(true);
+    //d3.json("../listing/borders_conus.json", drawMap);
+    redrawMap();
 })
 
 // always match the svg size to the canvas size.
 window.onresize = function() {
-    main_svg.attr("width", $main_canvas.offsetWidth);
-    main_svg.attr("height", $main_canvas.offsetHeight);
+    d3_main_svg.attr("width", $main_canvas.offsetWidth);
+    d3_main_svg.attr("height", $main_canvas.offsetHeight);
+    redrawMap();
   };
 
 $buffer_button_next.addEventListener("click", () => { bufferStep(1); })
@@ -365,7 +384,7 @@ $buffer_button_prev.addEventListener("click", () => { bufferStep(-1); })
 $buffer_button_toggle.addEventListener("click", () => { toggleBufferLoop(); })
 
 $menu_submit_button.addEventListener("click", async ()=>{
-    // Stop looping in order to load new data 
+    // Stop looping in order to load new data
     let was_looping = state["looping"];
     if (was_looping) { toggleBufferLoop(); }
     state["frozen"] += 1;
@@ -409,7 +428,7 @@ $menu_submit_button.addEventListener("click", async ()=>{
             setActiveTicker(buf_urls[0]["key"]);
         }
         else {
-            // 
+            //
             let prev_active = buf_urls.find(
                 (m) => m["key"] == state["tick_active"])
             if (prev_active == undefined) {
@@ -500,12 +519,29 @@ function toggleBufferLoop() {
 
 /* ---------------( D3JS stuff )--------------- */
 
-const main_svg = d3.select($display_wrapper_inner)
-    .append("svg")
-    .attr("width", $main_canvas.offsetWidth)
-    .attr("height", $main_canvas.offsetHeight)
-    .attr("id", "main_svg")
-    .style("position", "absolute")
-    .style("top", "0px")
-    .style("left", "0px")
-    .style("margin", "0px 12px");
+function redrawMap() {
+    d3_main_svg.selectAll("*").remove();
+    let geo = state["borders"]["conus"];
+    let d3_x = d3.scaleLinear()
+        .domain(d3.extent(state["latlon"]["lon"]))
+        .range([0,$main_svg.getAttribute("width")]);
+    let d3_y = d3.scaleLinear()
+        .domain(d3.extent(state["latlon"]["lat"]))
+        .range([$main_svg.getAttribute("height"), 0]);
+
+    let d3_proj = d3.geoTransform({
+        point: function(px, py) { this.stream.point(d3_x(px), d3_y(py)); }
+    });
+    let d3_path = d3.geoPath(d3_proj);
+
+    // make a group within the svg and get the border features from topojson
+    // then for each of them, make a svg path with the path generator attached.
+    d3_main_svg.append("g")
+        .selectAll("path")
+        .data(geo.features)
+        .enter().append("path")
+        .style("fill", "none")
+        .style("stroke", "white")
+        .attr("d", d3_path);
+}
+
