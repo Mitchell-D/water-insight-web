@@ -60,7 +60,7 @@ display prop types: https://www.w3schools.com/cssref/pr_class_display.php
     margin:10px 10px;
 }
 body {
-    background-image:url("../images/background-reduced.png");
+    background-image:url("images/background-reduced.png");
     background-position: top;
     background-repeat: repeat;
     background-size: cover;
@@ -90,8 +90,8 @@ body {
 }
 */
 #main_svg {
-    /*cursor:url(../images/crosshair-small.png) 16 16, auto;*/
-    cursor:url(../images/crosshair-xsmall.png) 8 8, auto;
+    /*cursor:url(images/crosshair-small.png) 16 16, auto;*/
+    cursor:url(images/crosshair-xsmall.png) 8 8, auto;
 }
 #display_wrapper_outer {
     position: relative;

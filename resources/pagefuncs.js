@@ -233,7 +233,7 @@ function loadDataFeed(){
         "datafeed",state["sel_region"],state["sel_res"],
         state["sel_feat"],state["sel_metric"].name
     ]
-    let furl = `../listing/${feed_fields.join("_")}.json`
+    let furl = `resources/listing/${feed_fields.join("_")}.json`
     // Fetch the datafeed JSON and update date selection and image buffer
     fetch(furl)
     .then((response) => {
@@ -353,12 +353,12 @@ function cap(val) {
 D.addEventListener("DOMContentLoaded", async function(){
     // acquire required data
     const listing = await Promise.all([
-        fetchJSON("../listing/aux_datafeats.json"),
-        fetchJSON("../listing/aux_timeres.json"),
-        fetchJSON("../listing/datamenu.json"),
-        fetchJSON("../listing/latlon.json"),
-        fetchJSON("../listing/cmap_nipy-spectral.json"),
-        fetchJSON("../listing/borders_conus.json")
+        fetchJSON("resources/listing/aux_datafeats.json"),
+        fetchJSON("resources/listing/aux_timeres.json"),
+        fetchJSON("resources/listing/datamenu.json"),
+        fetchJSON("resources/listing/latlon.json"),
+        fetchJSON("resources/listing/cmap_nipy-spectral.json"),
+        fetchJSON("resources/listing/borders_conus.json")
     ]);
     state["aux_feats"] = listing[0];
     state["aux_res"] = listing[1];
@@ -366,9 +366,7 @@ D.addEventListener("DOMContentLoaded", async function(){
     state["latlon"] = listing[3];
     state["cmap"] = listing[4];
     state["borders"]["conus"] = listing[5];
-    //loadMenuTimeRes(true);
     loadMenuRegion(true);
-    //d3.json("../listing/borders_conus.json", drawMap);
     redrawMap();
 })
 
