@@ -19,14 +19,6 @@
         <button class="navbar-toggler d-md-none collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#sidebar_menu" aria-controls="sidebar_menu" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <!--
-        <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
-        <div class="navbar-nav">
-        <div class="nav-item text-nowrap">
-            <a class="nav-link px-3" href="#">Sign out</a>
-        </div>
-        </div>
-        -->
     </header>
     
     <div class="container-fluid">
@@ -64,24 +56,13 @@
                 <div class="row justify-content-center" id="menu_display_settings_row">
                     <p class="text-center menu-section-title">Display Settings</p>
                     <div class="input-group menu-container-numform" id="menu_container_vmin">
-                        <!--<label for="menu_input_vmin" class="menu-dropdown-label">Value Min</label>-->
                         <span class="input-group-text menu-numform-label" id="menu_input_vmin">Value Min</span>
                         <input class="text-center form-control" type="number" aria-describeddby="menu_input_vmin" disabled></input>
                     </div>
                     <div class="input-group menu-container-numform" id="menu_container_vmax">
-                        <!--<label for="menu_input_vmax" class="menu-dropdown-label">Value Max</label>-->
                         <span class="input-group-text menu-numform-label" id="menu_input_vmax">Value Max</span>
                         <input class="text-center form-control" type="number" aria-describeddby="menu_input_vmax" disabled></input>
                     </div>
-                    <!--
-                    <p class="menu-dropdown-label">Color Maps</p>
-                    <div class="dropdown">
-                        <button class="btn btn-secondary dropdown-toggle menu-dropdown-button" type="button" id="menu_dropdown_colormap" data-bs-toggle="dropdown" aria-expanded="false">
-                            Color Maps
-                        </button>
-                        <ul class="dropdown-menu" aria-labelledby="menu_dropdown_colormap"> </ul>
-                    </div>
-                    -->
                 </div>
                 <hr/>
                 <div class="row justify-content-center" id="menu_date_range_row">
@@ -96,22 +77,6 @@
         </nav>
     
         <main class="col-md-8 ms-sm-auto col-lg-9 px-md-4">
-            <!-- Dashboard header with buttons and dropdown
-            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-            <h1 class="h2">Dashboard</h1>
-            <div class="btn-toolbar mb-2 mb-md-0">
-                <div class="btn-group me-2">
-                <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
-                <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
-                </div>
-                <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                This week
-                </button>
-            </div>
-            </div>
-            -->
-    
             <div class="row">
                 <div class="col-md-1"></div>
                 <div class="col-md-10" id="main_col_header">
@@ -121,8 +86,8 @@
                     <div class="row" id="main_canvas_row">
                         <div id="display_wrapper_outer">
                             <div id="display_wrapper_inner">
-                                <!--<img id="main_img" style="display: block;"></img>-->
                                 <canvas id="main_canvas" style="display: block;"></canvas>
+                                <!--<img id="main_img" style="display: block;"></img>-->
                             </div>
                         </div>
                     </div>
