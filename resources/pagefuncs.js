@@ -55,6 +55,8 @@ let $buffer_button_prev = D.getElementById("buffer_button_prev");
 let $buffer_button_toggle = D.getElementById("buffer_button_toggle");
 let $buffer_button_next = D.getElementById("buffer_button_next");
 let $buffer_input_framedelay = D.getElementById("buffer_input_framedelay");
+let $menu_nav = D.getElementById("sidebar_menu");
+let $menu_collapse_button = D.getElementById("menu_collapse_button");
 let $menu_container_region = D.getElementById("menu_container_region");
 let $menu_container_timeres = D.getElementById("menu_container_timeres");
 let $menu_container_feat = D.getElementById("menu_container_feat");
@@ -390,15 +392,24 @@ $menu_submit_button.addEventListener("click", async ()=>{
     let was_looping = state["looping"];
     if (was_looping) { toggleBufferLoop(); }
     state["frozen"] += 1;
+    // collapse the menu if it is expanded
+    if (!$menu_collapse_button.classList.contains("collapsed")) {
+        $menu_collapse_button.click();
+        //$menu_collapse_button.classList.add("collapsed");
+        //$menu_collapse_button.setAttribute("aria-expanded", "false");
+    }
+    // remove tickers currently in the buffer
     $main_container_ticker.replaceChildren();
-    state["image_buffer"] = {};
-    let buf_urls = [];
+    // set the main page header to the current product
     $main_header_text.innerText = [
         cap(state["sel_res"]),
         cap(state["sel_metric"]["name"]),
         state["aux_feats"][state["sel_feat"]]["long_title"],
         `(${state["aux_feats"][state["sel_feat"]]["unit"]})`,
     ].join(" ");
+    // Add tickers and load images for everything in the buffer
+    state["image_buffer"] = {};
+    let buf_urls = [];
     for (let i=state["buf_ixs"] ; i<=state["buf_ixf"] ; i++) {
         let ticker = $t_ticker.content.querySelector("div").cloneNode(true);
         //let ticker = D.importNode($t_ticker.content.querySelector("div"));
