@@ -21,19 +21,19 @@ aux_datafeats = {
         "soilm-40":{
             "long_title":"10-40cm Volumetric Soil Moisture",
             "short_title":"10-40cm VSM",
-            "unit":"%",
+            "unit":"kg / m^2",
             "default_metric":"mean",
             },
         "soilm-100":{
             "long_title":"40-100cm Volumetric Soil Moisture",
             "short_title":"40-100cm VSM",
-            "unit":"%",
+            "unit":"kg / m^2",
             "default_metric":"mean",
             },
         "soilm-200":{
             "long_title":"100-200cm Volumetric Soil Moisture",
             "short_title":"100-200cm VSM",
-            "unit":"%",
+            "unit":"kg / m^2",
             "default_metric":"mean",
             },
         "rsm-10":{
