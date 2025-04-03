@@ -138,8 +138,12 @@ body {
     margin: 10px 10px;
 }
 
+/* resources available remotely thru bootstrap, but can't be included */
 .form-check-input:checked[type="radio"] {
-    background-image: url(images/bg-radio.svg)
+    background-image: url(images/bg-radio.svg);
+}
+.navbar-dark .navbar-toggler-icon {
+    background-image: url(images/dropdown-lines.svg);
 }
 
 canvas {
