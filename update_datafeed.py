@@ -111,8 +111,8 @@ feat_order = [
 metric_order = ["mean", "min", "max", "stdev", "sum-or-diff"]
 
 if __name__=="__main__":
-    image_dir = Path("/rstor/mdodson/timegrid_frames/rgbs2")
-    feed_dir = Path("/rhome/mdodson/water-insight-web/listing")
+    image_dir = Path("/rstor/mdodson/timegrid_frames/rgbs")
+    feed_dir = Path("/rhome/mdodson/water-insight-web/resources/listing")
     default_norm_path = feed_dir.joinpath("cmap_default_norms.json")
     def_norms = json.load(default_norm_path.open("r"))
 
