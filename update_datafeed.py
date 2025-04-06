@@ -159,7 +159,8 @@ if __name__=="__main__":
                     print(f"Generated {feed_path.as_posix()}")
                     menu[rl][tl][fl].append({
                         "name":ml,
-                        "vrange":def_norms[fl][ml]
+                        "vrange":def_norms[fl][ml],
+                        "res":(224,464),
                         })
     json.dump(menu, feed_dir.joinpath("datamenu.json").open("w"))
     #'''
