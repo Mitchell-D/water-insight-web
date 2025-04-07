@@ -150,7 +150,17 @@
     </template>
     <template id="menu_dropdown"><li><a class="dropdown-item" href="#"></a></li></template>
     <template id="ticker_template"> <div id="" class="mr-1 border border-dark buffer-ticker buffer-ticker-disabled"></div> </template>
-    <template id="tooltip_template"> <div id=""></div> </template>
+    <template id="tooltip_template">
+        <div id="tooltip_container_inner" class="tooltip-text">
+          <div id="tooltip_button_close">
+            <i class="fa-solid fa-circle-xmark"></i>
+          </div>
+          <p id="tooltip_location" class="tooltip-text"></p>
+          <p id="tooltip_value" class="tooltip-text"></p>
+          <!--<a id="tooltip_timeseries" class="tooltip-text">Generate Time Series</a>-->
+          <button id="tooltip_button_timeseries" class="btn tooltip-text">Generate Time Series</button>
+        </div>
+    </template>
     <script src="resources/pkgs/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     <script type="text/javascript" src="resources/pkgs/jquery.min.js"></script>
     <script type="text/javascript" src="resources/pkgs/moment.min.js"></script>

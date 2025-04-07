@@ -92,6 +92,7 @@ body {
 #main_svg {
     /*cursor:url(images/crosshair-small.png) 16 16, auto;*/
     cursor:url(images/crosshair-xsmall-2.png) 8 8, auto;
+    z-index:10;
 }
 #display_wrapper_outer {
     position: relative;
@@ -145,6 +146,7 @@ body {
     /*position:absolute;*/
     top:0px;
     left:0px;
+    z-index:9;
 }
 canvas {
     image-rendering: optimizeSpeed;             /* Older versions of FF    */
@@ -153,4 +155,32 @@ canvas {
     image-rendering: -o-crisp-edges;            /* OS X & Windows Opera    */
     image-rendering: pixelated;                 /* Awesome future-browsers */
     -ms-interpolation-mode: nearest-neighbor;   /* IE                      */
+  }
+
+  #tooltip_container_inner {
+      opacity:1;
+      background-color:white;
+      border:solid;
+      border-width:2px;
+      border-radius:6px;
+      padding:12px 6px 6px 6px;
+  }
+  .tooltip-text {
+      margin: 0px;
+      font-size:75%;
+  }
+  #tooltip_button_close {
+      position:absolute;
+      top:2px;
+      right:5px;
+      font-size:10px;
+      font-weight:bold;
+      text-decoration:none;
+      color:black;
+  }
+  #tooltip_button_close:hover { color:orange; }
+  #tooltip_button_timeseries {
+      background-color:#0d6efd;
+      width:100%;
+      color:white;
   }

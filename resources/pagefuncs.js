@@ -35,11 +35,14 @@ let state = {
     // image iteration
     "tick_active":null,
     "looping":false,
+
+    // popup tooltip on map click
+    "tooltip_active":false,
 }
 
 //const parser = new DOMParser();
 //const img_dir_url = "https://www.nsstc.uah.edu/data/mitchell.dodson/nldas2/rgbs/";
-const img_dir_url = "/data/mitchell.dodson/nldas2/rgbs";
+const img_dir_url = "/data/mitchell.dodson/nldas2/rgbs/";
 var cycle_handle = null;
 
 let D = document;
@@ -47,6 +50,7 @@ let $t_time_res_radio = D.getElementById("radio_time_res_temp");
 let $t_region_radio = D.getElementById("radio_region_temp");
 let $t_menu_dropdown = D.getElementById("menu_dropdown");
 let $t_ticker = D.getElementById("ticker_template");
+let $t_tooltip = D.getElementById("tooltip_template");
 let $main_canvas = D.getElementById("main_canvas");
 //let $main_img = D.getElementById("main_img");
 let $main_container_ticker = D.getElementById("main_container_ticker");
@@ -72,16 +76,6 @@ let $display_wrapper_inner = D.getElementById("display_wrapper_inner");
 const main_ctx = $main_canvas.getContext("2d", {"alpha":false});
 main_ctx.imageSmoothingEnabled = false;
 
-// create a tooltip
-const d3_tooltip = d3.select($display_wrapper_inner)
-    .append("div")
-    .style("opacity", 0)
-    .attr("class", "tooltip")
-    .style("background-color", "white")
-    .style("border", "solid")
-    .style("border-width", "2px")
-    .style("border-radius", "5px")
-    .style("padding", "5px");
 
 const d3_main_svg = d3.select($display_wrapper_inner)
     .append("svg")
@@ -95,18 +89,109 @@ const d3_main_svg = d3.select($display_wrapper_inner)
     .on("click", function () {
         let mouse = d3.mouse(this);
         let dims = state["sel_metric"]["res"];
-        let yscale = dims[0] / $main_svg.getAttribute("height");
-        let xscale = dims[1] / $main_svg.getAttribute("width");
-        console.log(mouse, yscale, xscale);
-        let red_ix = Math.round(mouse[0] * dims[0] * 4 * yscale)
-            + Math.round(mouse[1] * 4 * xscale);
-        console.log(red_ix);
-        let imdata = main_ctx.getImageData(0, 0, dims[0], dims[1]);
+        // get mouse y and x position from the top left in canvas coords
+        let my = Math.round(
+                 //dims[0] * mouse[1] / $main_svg.getAttribute("height")
+                 dims[0] * mouse[1] / $main_canvas.offsetHeight - .5
+                );
+        let mx = Math.round(
+                dims[1] * mouse[0] / $main_canvas.offsetWidth - .5
+                );
+
+        let red_ix = 4 * (my * dims[1] + mx)
+        let imdata = main_ctx.getImageData(0, 0, dims[1], dims[0]);
         let px_rgb = imdata.data.slice(red_ix, red_ix+3);
-        console.log(px_rgb);
+
+        let vrange = state["sel_metric"]["vrange"];
+        let bin_range = getCMapValue(px_rgb);
+
+        if (bin_range==null){
+            closeTooltip();
+        }
+        else {
+            d3_tooltip.style("opacity", 1)
+                    .style("top", (mouse[1]-0) + "px")
+                    .style("left", (mouse[0]+10) + "px")
+                    .style("z-index", "15");
+            d3_tooltip.select("#tooltip_location").html(
+                    "<b>Location</b>: ("
+                    + state["latlon"]["lat"][my].toFixed(2)
+                    + ", "
+                    + state["latlon"]["lon"][mx].toFixed(2)
+                    + ")"
+                    );
+            d3_tooltip.select("#tooltip_value").html(
+                    "<b>Value Bin</b>: ("
+                    + ((vrange[1]-vrange[0])*bin_range[1]).toFixed(3)+vrange[0]
+                    + ", "
+                    + ((vrange[1]-vrange[0])*bin_range[2]).toFixed(3)+vrange[0]
+                    + ")"
+                    );
+            state["sel_px"] = [my, mx, red_ix];
+            state["tooltip_active"] = true;
+        }
     });
 
 let $main_svg = D.getElementById("main_svg");
+
+// create a tooltip
+const d3_tooltip = d3.select($display_wrapper_inner)
+    .append("div")
+    .attr("id", "tooltip_container_outer")
+    .style("opacity", 0)
+    .style("position", "absolute")
+    .style("z-index", "-1")
+    .html($t_tooltip.innerHTML);
+
+let $tooltip_button_close = D.getElementById("tooltip_button_close");
+let $tooltip_button_timeseries = D.getElementById("tooltip_button_timeseries");
+
+// Use the cmap lookup table for this metric to estimate a data value from rgb
+function getCMapValue(rgb){
+    let fill = state["sel_metric"]["fill"];
+    let ix_match = state["cmap"]["map"].findIndex((c)=>{
+        return (c[0]==rgb[0]) & (c[1]==rgb[1]) & (c[2]==rgb[2]);
+    });
+    // if not directly in lut, use distance to find closest if not fill value
+    if (ix_match == -1) {
+        if (rgb[0]==fill[0] & rgb[1]==fill[1] & rgb[2]==fill[2]){
+            ix_match = null;
+        }
+        else {
+            let d_min = 10000000;
+            let d_tmp = null;
+            let ix_tmp = 0;
+            for (bin of state["cmap"]["map"]){
+                d_tmp = (bin[0]-rgb[0])**2
+                    + (bin[1]-rgb[1])**2
+                    + (bin[2]-rgb[2])**2;
+                if (d_tmp < d_min){
+                    d_min = d_tmp;
+                    ix_match = ix_tmp
+                }
+                ix_tmp++;
+            }
+        }
+    }
+    if (ix_match===null){ return null; }
+    let bin_min = (ix_match)/state["cmap"]["map"].length;
+    let bin_max = (ix_match+1)/state["cmap"]["map"].length;
+    return [ix_match, bin_min, bin_max];
+}
+
+
+/* ---------------( Tooltip Operations )--------------- */
+
+function closeTooltip() {
+    if (state["tooltip_active"]) {
+        d3_tooltip.style("opacity", 0)
+            .style("top", "0px")
+            .style("left", "0px")
+            .style("z-index","-1");
+        state["tooltip_active"] = false;
+        state["sel_px"] = null;
+    }
+}
 
 /* ---------------( Menu Update Functions )--------------- */
 
@@ -409,6 +494,8 @@ window.onresize = function() {
 $buffer_button_next.addEventListener("click", () => { bufferStep(1); })
 $buffer_button_prev.addEventListener("click", () => { bufferStep(-1); })
 $buffer_button_toggle.addEventListener("click", () => { toggleBufferLoop(); })
+$tooltip_button_close.addEventListener("click", () => { closeTooltip(); })
+$tooltip_button_timeseries.addEventListener("click", () => {getTimeSeries();})
 
 $menu_submit_button.addEventListener("click", async ()=>{
     // Stop looping in order to load new data
@@ -421,6 +508,8 @@ $menu_submit_button.addEventListener("click", async ()=>{
         //$menu_collapse_button.classList.add("collapsed");
         //$menu_collapse_button.setAttribute("aria-expanded", "false");
     }
+    //remove any active tooltips
+    closeTooltip();
     $main_canvas.setAttribute("height", state["sel_metric"]["res"][0]);
     $main_canvas.setAttribute("width", state["sel_metric"]["res"][1]);
     d3_main_svg.attr("width", $main_canvas.offsetWidth);
@@ -548,6 +637,8 @@ function bufferStep(step=1) {
 function toggleBufferLoop() {
     // Ignore toggle operations if images are loading
     if (state["frozen"] > 0){ return; }
+    // don't preserve tooltip while animating
+    closeTooltip();
     let fd = $buffer_input_framedelay.value;
     if (state["looping"]) {
         clearInterval(cycle_handle);
@@ -560,7 +651,7 @@ function toggleBufferLoop() {
     }
 }
 
-/* ---------------( D3JS stuff )--------------- */
+/* ---------------( D3JS map stuff )--------------- */
 
 function redrawMap() {
     d3_main_svg.selectAll("*").remove();
@@ -588,3 +679,21 @@ function redrawMap() {
         .attr("d", d3_path);
 }
 
+/* ---------------( Time Series Operations)--------------- */
+
+function getTimeSeries() {
+    console.log("getting time series for ", state["sel_px"]);
+    let dims = state["sel_metric"]["res"];
+    let osc = new OffscreenCanvas(dims[1], dims[0]);
+    let ctx = osc.getContext("2d");
+    let imdata = null;
+    let px_rgb = null;
+    let values = [];
+    for (i in state["image_buffer"]){
+        ctx.drawImage(state["image_buffer"][i]["img"], 0, 0, dims[1], dims[0]);
+        imdata = ctx.getImageData(0, 0, dims[1], dims[0]);
+        px_rgb = imdata.data.slice(state["sel_px"][2], state["sel_px"][2]+3);
+        values.push(getCMapValue(px_rgb));
+    }
+    console.log(values);
+}

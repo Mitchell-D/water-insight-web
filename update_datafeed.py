@@ -160,7 +160,8 @@ if __name__=="__main__":
                     menu[rl][tl][fl].append({
                         "name":ml,
                         "vrange":def_norms[fl][ml],
-                        "res":(224,464),
+                        "res":(195,462), ## image resolution
+                        "fill":(64,64,64), ## mask color (rgb)
                         })
     json.dump(menu, feed_dir.joinpath("datamenu.json").open("w"))
     #'''
