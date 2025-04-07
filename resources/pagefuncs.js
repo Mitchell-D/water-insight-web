@@ -38,7 +38,8 @@ let state = {
 }
 
 //const parser = new DOMParser();
-const img_dir_url = "https://www.nsstc.uah.edu/data/mitchell.dodson/nldas2/rgbs/";
+//const img_dir_url = "https://www.nsstc.uah.edu/data/mitchell.dodson/nldas2/rgbs/";
+const img_dir_url = "/data/mitchell.dodson/nldas2/rgbs";
 var cycle_handle = null;
 
 let D = document;
@@ -68,19 +69,42 @@ let $menu_dropdown_metric = D.getElementById("menu_dropdown_metric");
 let $menu_date_range = D.getElementById("menu_date_range");
 let $menu_submit_button = D.getElementById("menu_submit_button");
 let $display_wrapper_inner = D.getElementById("display_wrapper_inner");
-
 const main_ctx = $main_canvas.getContext("2d", {"alpha":false});
 main_ctx.imageSmoothingEnabled = false;
 
+// create a tooltip
+const d3_tooltip = d3.select($display_wrapper_inner)
+    .append("div")
+    .style("opacity", 0)
+    .attr("class", "tooltip")
+    .style("background-color", "white")
+    .style("border", "solid")
+    .style("border-width", "2px")
+    .style("border-radius", "5px")
+    .style("padding", "5px");
+
 const d3_main_svg = d3.select($display_wrapper_inner)
     .append("svg")
-    .attr("width", $main_canvas.offsetWidth)
-    .attr("height", $main_canvas.offsetHeight)
+    //.attr("width", $main_canvas.offsetWidth)
+    //.attr("height", $main_canvas.offsetHeight)
     .attr("id", "main_svg")
     .style("position", "absolute")
     .style("top", "0px")
     .style("left", "0px")
-    .style("margin", "0px 12px");
+    .style("margin", "0px 12px")
+    .on("click", function () {
+        let mouse = d3.mouse(this);
+        let dims = state["sel_metric"]["res"];
+        let yscale = dims[0] / $main_svg.getAttribute("height");
+        let xscale = dims[1] / $main_svg.getAttribute("width");
+        console.log(mouse, yscale, xscale);
+        let red_ix = Math.round(mouse[0] * dims[0] * 4 * yscale)
+            + Math.round(mouse[1] * 4 * xscale);
+        console.log(red_ix);
+        let imdata = main_ctx.getImageData(0, 0, dims[0], dims[1]);
+        let px_rgb = imdata.data.slice(red_ix, red_ix+3);
+        console.log(px_rgb);
+    });
 
 let $main_svg = D.getElementById("main_svg");
 
@@ -114,7 +138,6 @@ function loadMenuTimeRes(initial_load=false){
     //for (const k in state["aux_res"]) {
     $menu_container_timeres.replaceChildren();
     for (const k in state["datamenu"][state["sel_region"]]) {
-        console.log(k);
         let tmp_radio = $t_time_res_radio.content.cloneNode(true);
         /*
         // load date
@@ -398,6 +421,12 @@ $menu_submit_button.addEventListener("click", async ()=>{
         //$menu_collapse_button.classList.add("collapsed");
         //$menu_collapse_button.setAttribute("aria-expanded", "false");
     }
+    $main_canvas.setAttribute("height", state["sel_metric"]["res"][0]);
+    $main_canvas.setAttribute("width", state["sel_metric"]["res"][1]);
+    d3_main_svg.attr("width", $main_canvas.offsetWidth);
+    d3_main_svg.attr("height", $main_canvas.offsetHeight);
+    redrawMap();
+
     // remove tickers currently in the buffer
     $main_container_ticker.replaceChildren();
     // set the main page header to the current product
@@ -460,6 +489,7 @@ $menu_submit_button.addEventListener("click", async ()=>{
 function getImagePromise(key_url_bix){
     return new Promise((resolve, reject) => {
         let img = new Image();
+        //img.crossOrigin = "anonymous";
         img.onload = () => {
             state["image_buffer"][key_url_bix["key"]] = {
                 "url":key_url_bix["url"],
