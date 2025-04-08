@@ -31,6 +31,10 @@ display prop types: https://www.w3schools.com/cssref/pr_class_display.php
     background-color:#e9ecef;
     overflow-x:hidden;
 }
+#sidebar_menu > .offcanvas-body {
+    background-color:#e9ecef;
+    overflow-x:hidden;
+}
 .menu-dropdown-label {
     margin-bottom:0px;
     margin:0px 20px;
@@ -46,10 +50,10 @@ display prop types: https://www.w3schools.com/cssref/pr_class_display.php
 .menu-numform-label {
     width:100px;
 }
-#menu_date_range {
-    padding:10px 10px;
-    margin:0px 10px;
-    width:80%;
+#buffer_date_range {
+    margin: 0px;
+    padding:6px 10px;
+    width:100%;
 }
 #menu_submit_button {
     color:white;
@@ -112,8 +116,8 @@ body {
 .buffer-ticker-active { background:#0d6efd; }
 .buffer-button {
     background-color:#0d6efd;
-    width:25%;
     height:40px;
+    color:white;
 }
 .buffer-fa-span {
     color: #ffffff;
@@ -131,6 +135,10 @@ body {
     min-width:150px;
     margin: 10px 10px;
 }
+#buffer_container_daterange {
+    margin: 10px;
+    padding: 0px;
+}
 
 /* resources available remotely thru bootstrap, but can't be included */
 .form-check-input:checked[type="radio"] {
@@ -138,6 +146,9 @@ body {
 }
 .navbar-dark .navbar-toggler-icon {
     background-image: url(images/dropdown-lines.svg);
+}
+.btn-close {
+    background: transparent url("images/offcanvas-close.svg") center/1em auto no-repeat;
 }
 
 #main_canvas {

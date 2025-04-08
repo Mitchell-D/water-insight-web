@@ -70,7 +70,7 @@ let $menu_container_vmin = D.getElementById("menu_container_vmin");
 let $menu_container_vmax = D.getElementById("menu_container_vmax");
 let $menu_dropdown_feat = D.getElementById("menu_dropdown_feat");
 let $menu_dropdown_metric = D.getElementById("menu_dropdown_metric");
-let $menu_date_range = D.getElementById("menu_date_range");
+let $buffer_date_range = D.getElementById("buffer_date_range");
 let $menu_submit_button = D.getElementById("menu_submit_button");
 let $display_wrapper_inner = D.getElementById("display_wrapper_inner");
 const main_ctx = $main_canvas.getContext("2d", {"alpha":false});
@@ -309,7 +309,9 @@ function loadMenuDataMetrics(initial_load=false) {
         tmp_dd.querySelector(".dropdown-item").textContent = tmpm["name"];
         tmp_dd.querySelector("a").value = tmpm["name"];
         tmp_dd.querySelector("a").onclick = function(v){
-            setDataMetricState(metrics.find((m) => m.name == v.target.value))
+            setDataMetricState(
+                    metrics.find((m) => m.name == v.target.value),
+                    initial_load)
         }
         $menu_container_metric.querySelector("ul").append(tmp_dd);
         // record if this sel_feat has the same metric as previously selected
@@ -329,18 +331,18 @@ function loadMenuDataMetrics(initial_load=false) {
         // otherwise select the configured default metric for this sel_feat
         else { new_mname = state["aux_feats"][aux_feat["default_metric"]]; }
     }
-    setDataMetricState(metrics.find((el) => el.name==new_mname));
+    setDataMetricState(metrics.find((el) => el.name==new_mname), initial_load);
 }
 
-function setDataMetricState(new_state) {
+function setDataMetricState(new_state, initial_load=false) {
     state["sel_metric"] = new_state;
     $menu_dropdown_metric.textContent = new_state["name"];
     $menu_container_vmin.querySelector("input").value = new_state["vrange"][0];
     $menu_container_vmax.querySelector("input").value = new_state["vrange"][1];
-    loadDataFeed();
+    loadDataFeed(initial_load);
 }
 
-function loadDataFeed(){
+function loadDataFeed(initial_load=false){
     // Use the current selection state to determine the datafeed to retrieve
     //feed_str = `${state["sel_res"]}_${state["sel_feat"]}_${state["sel_metric"]}`
     let feed_fields = [
@@ -358,6 +360,9 @@ function loadDataFeed(){
         let dt = 60*60*24*7*6 // display 6 weeks initially
         state["datafeed"] = json;
         setFeedDateRange(json[0]["etime"], json[json.length-1]["etime"], dt);
+        if (initial_load) {
+            $menu_submit_button.click();
+        }
     })
 }
 
@@ -381,7 +386,7 @@ function setFeedDateRange(etime_init, etime_final, init_dt){
 
     state["buf_ixs"] = getFirstFeedIndexAfter(state["buf_ts"]);
     state["buf_ixf"] = getLastFeedIndexBefore(state["buf_tf"]);
-    $("#menu_date_range").daterangepicker({
+    $("#buffer_date_range").daterangepicker({
         "showDropdowns": true,
         "minYear": t0.getFullYear(),
         "maxYear": tf.getFullYear(),
@@ -389,6 +394,7 @@ function setFeedDateRange(etime_init, etime_final, init_dt){
         "endDate": `${bf.getMonth()+1}/${bf.getDate()}/${bf.getFullYear()}`,
         "minDate": `${t0.getMonth()+1}/${t0.getDate()}/${t0.getFullYear()}`,
         "maxDate": `${tf.getMonth()+1}/${tf.getDate()}/${tf.getFullYear()}`,
+        "drops": "auto",
     }, function(start, end, label){
         state["buf_ts"] = start.unix();
         state["buf_tf"] = end.unix();
@@ -549,6 +555,7 @@ $menu_submit_button.addEventListener("click", async ()=>{
             "key":ticker.title, // use title so shared between datasets
             "url":img_dir_url+state["datafeed"][i]["fname"],
             "bix":i-state["buf_ixs"],
+            "stime":state["datafeed"][i]["stime"],
         });
     }
     Promise.allSettled(buf_urls.map(getImagePromise)).then((v) => {
@@ -571,7 +578,7 @@ $menu_submit_button.addEventListener("click", async ()=>{
         }
         if (was_looping) { toggleBufferLoop(); }
     });
-})
+});
 
 /* ---------------( Image Buffer Operations )--------------- */
 
@@ -681,19 +688,33 @@ function redrawMap() {
 
 /* ---------------( Time Series Operations)--------------- */
 
+// Use an OffscreenCanvas object to pull pixel values for the selected pixel
+// and collect them as a time series array.
 function getTimeSeries() {
     console.log("getting time series for ", state["sel_px"]);
     let dims = state["sel_metric"]["res"];
+    let vrange = state["sel_metric"]["vrange"];
     let osc = new OffscreenCanvas(dims[1], dims[0]);
     let ctx = osc.getContext("2d");
     let imdata = null;
     let px_rgb = null;
     let values = [];
+    let bin_range = null;
     for (i in state["image_buffer"]){
         ctx.drawImage(state["image_buffer"][i]["img"], 0, 0, dims[1], dims[0]);
         imdata = ctx.getImageData(0, 0, dims[1], dims[0]);
         px_rgb = imdata.data.slice(state["sel_px"][2], state["sel_px"][2]+3);
-        values.push(getCMapValue(px_rgb));
+        bin_range = getCMapValue(px_rgb);
+        values.push({
+            "key":i,
+            "bin_range":[
+                bin_range[1]*(vrange[1]-vrange[0])+vrange[0],
+                bin_range[2]*(vrange[1]-vrange[0])+vrange[0]
+            ],
+            "bin_color":px_rgb,
+            "stime":state["image_buffer"][i]["stime"],
+        });
+
     }
     console.log(values);
 }
