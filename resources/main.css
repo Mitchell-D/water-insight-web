@@ -196,3 +196,6 @@ canvas {
       color:white;
       margin-top:5px;
   }
+  .modal-dialog {
+      max-width:80%;
+  }

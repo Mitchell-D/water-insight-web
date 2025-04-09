@@ -70,9 +70,12 @@ let $menu_container_vmin = D.getElementById("menu_container_vmin");
 let $menu_container_vmax = D.getElementById("menu_container_vmax");
 let $menu_dropdown_feat = D.getElementById("menu_dropdown_feat");
 let $menu_dropdown_metric = D.getElementById("menu_dropdown_metric");
+let $subset_modal = D.getElementById("subset_modal");
+let $subset_modal_label = D.getElementById("subset_modal_label");
 let $buffer_date_range = D.getElementById("buffer_date_range");
 let $menu_submit_button = D.getElementById("menu_submit_button");
 let $display_wrapper_inner = D.getElementById("display_wrapper_inner");
+let $timeseries_modal_close = D.getElementById("timeseries_modal_close");
 const main_ctx = $main_canvas.getContext("2d", {"alpha":false});
 main_ctx.imageSmoothingEnabled = false;
 
@@ -501,7 +504,15 @@ $buffer_button_next.addEventListener("click", () => { bufferStep(1); })
 $buffer_button_prev.addEventListener("click", () => { bufferStep(-1); })
 $buffer_button_toggle.addEventListener("click", () => { toggleBufferLoop(); })
 $tooltip_button_close.addEventListener("click", () => { closeTooltip(); })
-$tooltip_button_timeseries.addEventListener("click", () => {getTimeSeries();})
+$tooltip_button_timeseries.addEventListener("click", () => {
+    plotTimeSeries(getTimeSeries());
+    $("#timeseries_modal").modal("show");
+})
+$("#timeseries_modal").on("hidden.bs.modal", (e) => {
+    d3.select("#ts_ax_x").remove();
+    d3.select("#ts_ax_y").remove();
+    d3.select("#ts_path").remove();
+})
 
 $menu_submit_button.addEventListener("click", async ()=>{
     // Stop looping in order to load new data
@@ -591,6 +602,7 @@ function getImagePromise(key_url_bix){
                 "url":key_url_bix["url"],
                 "bix":key_url_bix["bix"],
                 "img":img,
+                "stime":key_url_bix["stime"],
             }
             let ticker = $main_container_ticker.childNodes[key_url_bix["bix"]];
             ticker.classList.remove("buffer-ticker-disabled");
@@ -602,6 +614,7 @@ function getImagePromise(key_url_bix){
                 "url":key_url_bix["url"],
                 "bix":key_url_bix["bix"],
                 "img":img,
+                "stime":key_url_bix["stime"],
             };
             reject();
         }
@@ -688,10 +701,22 @@ function redrawMap() {
 
 /* ---------------( Time Series Operations)--------------- */
 
+// margins within the svg coordinates
+const ts_svg_margin = {"top":10, "bottom":30, "right":30, "left":60}
+const ts_svg_width = 700 - ts_svg_margin["left"] - ts_svg_margin["right"]
+const ts_svg_height = 350 - ts_svg_margin["top"] - ts_svg_margin["bottom"]
+// declare the time series plotting svg
+const ts_svg = d3.select("#timeseries_svg_container")
+    .append("svg")
+    .attr("id", "timeseries_svg")
+    .attr("width", ts_svg_width+ts_svg_margin["left"]+ts_svg_margin["right"])
+    .attr("height", ts_svg_width+ts_svg_margin["top"]+ts_svg_margin["bottom"])
+    .append("g")
+    .attr("transform",`translate(${ts_svg_margin.left},${ts_svg_margin.top})`);
+
 // Use an OffscreenCanvas object to pull pixel values for the selected pixel
 // and collect them as a time series array.
 function getTimeSeries() {
-    console.log("getting time series for ", state["sel_px"]);
     let dims = state["sel_metric"]["res"];
     let vrange = state["sel_metric"]["vrange"];
     let osc = new OffscreenCanvas(dims[1], dims[0]);
@@ -716,5 +741,36 @@ function getTimeSeries() {
         });
 
     }
-    console.log(values);
+    return values;
+}
+
+function plotTimeSeries(ts_data) {
+    // x axis declaration
+    const ax_x = d3.scaleTime()
+        .domain(d3.extent(ts_data, (d)=>{
+            return d3.timeParse("%Y%m%d")(d["stime"])
+        }))
+        .range([0, ts_svg_width]);
+    ts_svg.append("g")
+        .attr("transform", `translate(0, ${ts_svg_height})`)
+        .attr("id", "ts_ax_x")
+        .call(d3.axisBottom(ax_x));
+    // y axis declaration
+    const ax_y = d3.scaleLinear()
+        .domain(state["sel_metric"]["vrange"])
+        .range([ts_svg_height, 0]);
+    ts_svg.append("g")
+        .attr("id", "ts_ax_y")
+        .call(d3.axisLeft(ax_y));
+    // append data line
+    ts_svg.append("path")
+        .attr("id", "ts_path")
+        .datum(ts_data)
+        .attr("fill", "none")
+        .attr("stroke", "steelblue")
+        .attr("stroke-width", 1.5)
+        .attr("d", d3.line()
+            .x((d) => { return ax_x(d3.timeParse("%Y%m%d")(d["stime"])) })
+            .y((d) => { return ax_y(d["bin_range"][0]) })
+            );
 }

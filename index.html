@@ -18,7 +18,22 @@
         <a class="navbar-brand col-md-4 col-lg-2 me-0 px-3" href="#">NASA Water Insight Web Viewer</a>
     </header>
 
-    <div class="container-fluid">
+    <div class="modal fade" id="timeseries_modal" tabindex="-1" aria-labelledby="timeseries_modal_label" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="timeseries_modal_label">Modal title</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="timeseries_modal_close"></button>
+          </div>
+          <div class="modal-body">
+            <div id="timeseries_svg_container">
+            </div>
+          </div>
+          <div class="modal-footer"> </div>
+        </div>
+      </div>
+    </div>
+
     <div class="offcanvas offcanvas-start" tabindex="-1" id="sidebar_menu" aria-labelledby="sidebar_menu_label">
       <div class="offcanvas-header">
         <h5 class="offcanvas-title" id="sidebar_menu_label">Data Selection Menu</h5>
@@ -71,69 +86,69 @@
       </div>
     </div>
 
+    <div class="container-fluid">
+      <main class="col-lg-12 px-md-4">
         <div class="row">
-        <main class="col-lg-12 px-md-4">
-            <div class="row">
-                <div class="col-md-1"></div>
-                <div class="col-md-10" id="main_col_header">
-                    <div class="row text-center">
-                        <p id="main_header_text">---</p>
-                    </div>
-                    <div class="row" id="main_canvas_row">
-                        <div id="display_wrapper_outer">
-                            <div id="display_wrapper_inner">
-                                <canvas id="main_canvas" style="display: block;"></canvas>
-                                <!--<img id="main_img" style="display: block;"></img>-->
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <h6 id="main_label_active" class="text-center"></h6>
-                    </div>
-                    <div class="row">
-                        <div id="main_container_ticker" class="d-flex flex-wrap p-2 justify-content-center align-items-center"></div>
-                    </div>
-                    <div class="row" id="buffer_forms">
-                        <div class="col-xl-4 align-self-center order-xl-2">
-                            <div class="row justify-content-center">
-                                <button data-placement="left" class="btn m-1 buffer-button w-25" id="buffer_button_prev">
-                                    <span class="fa-solid fa-chevron-left fa-xs buffer-fa-span"></span>
-                                </button>
-                                <button class="btn m-1 buffer-button w-25" id="buffer_button_toggle">
-                                    <span class="fa-solid fa-play fa-xs buffer-fa-span"></span>
-                                    <span class="fa-solid fa-pause fa-xs buffer-fa-span"></span>
-                                </button>
-                                <button data-placement="left" class="btn m-1 buffer-button w-25" id="buffer_button_next">
-                                    <span class="fa-solid fa-chevron-right fa-xs buffer-fa-span"></span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-xl-4 align-self-center order-xl-1">
-                            <div class="row justify-content-center" id="buffer_date_range_row">
-                                <div class="input-group w-75" id="buffer_container_daterange">
-                                    <!--<label for="buffer_date_range" class="form-label" id="buffer_label_daterange">Date Range</label>-->
-                                    <input id="buffer_date_range" name="daterange" class="form-control" type="text"/>
-                                </div>
-                            </div>
-                            <div class="row justify-content-center">
-                                <button class="btn m-1 buffer-button w-75" data-bs-toggle="offcanvas" href="#sidebar_menu" role="button" aria-controls="sidebar_menu">
-                                  Open Data Menu
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-xl-4 align-self-center order-xl-3">
-                            <div class="row">
-                                <div class="input-group justify-content-center" id="buffer_container_framedelay">
-                                    <label for="buffer_input_framedelay" class="form-label" id="buffer_label_framedelay">Frame Delay (ms)</label>
-                                    <input id="buffer_input_framedelay" class="text-center form-control" type="number" step=10 min=10 value=100 max=5000></input>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-1"></div>
+          <div class="col-md-1"></div>
+          <div class="col-md-10" id="main_col_header">
+            <div class="row text-center">
+                <p id="main_header_text">---</p>
             </div>
-        </main>
+            <div class="row" id="main_canvas_row">
+              <div id="display_wrapper_outer">
+                <div id="display_wrapper_inner">
+                  <canvas id="main_canvas" style="display: block;"></canvas>
+                  <!--<img id="main_img" style="display: block;"></img>-->
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <h6 id="main_label_active" class="text-center"></h6>
+            </div>
+            <div class="row">
+              <div id="main_container_ticker" class="d-flex flex-wrap p-2 justify-content-center align-items-center"></div>
+            </div>
+            <div class="row" id="buffer_forms">
+              <div class="col-xl-4 align-self-center order-xl-2">
+                <div class="row justify-content-center">
+                  <button data-placement="left" class="btn m-1 buffer-button w-25" id="buffer_button_prev">
+                    <span class="fa-solid fa-chevron-left fa-xs buffer-fa-span"></span>
+                  </button>
+                  <button class="btn m-1 buffer-button w-25" id="buffer_button_toggle">
+                    <span class="fa-solid fa-play fa-xs buffer-fa-span"></span>
+                    <span class="fa-solid fa-pause fa-xs buffer-fa-span"></span>
+                  </button>
+                  <button data-placement="left" class="btn m-1 buffer-button w-25" id="buffer_button_next">
+                    <span class="fa-solid fa-chevron-right fa-xs buffer-fa-span"></span>
+                  </button>
+                </div>
+              </div>
+              <div class="col-xl-4 align-self-center order-xl-1">
+                <div class="row justify-content-center" id="buffer_date_range_row">
+                  <div class="input-group w-75" id="buffer_container_daterange">
+                    <!--<label for="buffer_date_range" class="form-label" id="buffer_label_daterange">Date Range</label>-->
+                    <input id="buffer_date_range" name="daterange" class="form-control" type="text"/>
+                  </div>
+                </div>
+                <div class="row justify-content-center">
+                  <button class="btn m-1 buffer-button w-75" data-bs-toggle="offcanvas" href="#sidebar_menu" role="button" aria-controls="sidebar_menu">
+                    Open Data Menu
+                  </button>
+                </div>
+              </div>
+              <div class="col-xl-4 align-self-center order-xl-3">
+                <div class="row">
+                  <div class="input-group justify-content-center" id="buffer_container_framedelay">
+                    <label for="buffer_input_framedelay" class="form-label" id="buffer_label_framedelay">Frame Delay (ms)</label>
+                    <input id="buffer_input_framedelay" class="text-center form-control" type="number" step=10 min=10 value=100 max=5000></input>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-1"></div>
+        </div>
+      </main>
     </div>
     <template id="radio_region_temp">
         <div class="form-check">
