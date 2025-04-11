@@ -404,6 +404,9 @@ function setFeedDateRange(etime_init, etime_final, init_dt){
         state["buf_ixs"] = getFirstFeedIndexAfter(state["buf_ts"], true);
         state["buf_ixf"] = getLastFeedIndexBefore(state["buf_tf"], true);
     });
+    $("#buffer_date_range").on("apply.daterangepicker", (ev,picker) => {
+        $menu_submit_button.click();
+    })
 }
 
 function getFirstFeedIndexAfter(etime, inclusive=true) {
